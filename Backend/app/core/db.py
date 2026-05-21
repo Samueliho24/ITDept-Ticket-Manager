@@ -12,11 +12,9 @@ password = os.getenv("DB_PASSWORD")
 database = os.getenv("DB_DATABASE")
 port = os.getenv("DB_PORT")
 
-DATABASE_URL = f"mariadb+mariadbconnector://{user}:{password}@{host}:{port}/{database}"
+DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
 
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

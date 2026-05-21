@@ -1,25 +1,25 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey
+from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from BackEnd import Base
-import datetime , uuid
+from BackEnd.app.core.db import Base
+import datetime, uuid
 
 class Users(Base):
     __tablename__ = "users"
-    
-    id = Column(String, primary_key=True, index=True, nullable=False, default=lambda: str(uuid.uuid4()))
-    name = Column(String, nullable=False)
-    lastname = Column(String, nullable=False)
-    username = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-    role = Column(String, nullable=False)
+
+    id = Column(String(36), primary_key=True, index=True, nullable=False, default=lambda: str(uuid.uuid4()))
+    name = Column(String(100), nullable=False)
+    lastname = Column(String(100), nullable=False)
+    username = Column(String(50), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
+    role = Column(String(20), nullable=False)
     active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    department_id = Column(String, ForeignKey("departments.id"))
-    
+    department_id = Column(String(36), ForeignKey("departments.id"))
+
     department = relationship("Departments", foreign_keys=[department_id], back_populates="user")
 
-    tickets_assigned = relationship("Tickets", back_populates="assigned_technician")
+    tickets_assigned = relationship("Tickets", foreign_keys="Tickets.assigned_technician_id", back_populates="assigned_technician")
 
-    tickets_requested = relationship("Tickets", back_populates="requester")
-    
+    tickets_requested = relationship("Tickets", foreign_keys="Tickets.requester_id", back_populates="requester")
+
     change_history = relationship("ChangeHistory", back_populates="user")
