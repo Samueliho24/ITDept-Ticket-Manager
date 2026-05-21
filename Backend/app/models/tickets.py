@@ -10,7 +10,7 @@ class Tickets(Base):
     title = Column(String(255), nullable=False)
     description = Column(String(500))
     priority = Column(Enum('Baja', 'Media', 'Alta', 'Crítica'), default='Media')
-    status = Column(Enum('Abierto', 'En Proceso', 'Resuelto', 'Cerrado'), default='Abierto')
+    status = Column(Enum('Abierto', 'Asignado', 'En Proceso', 'Pendiente', 'Resuelto', 'Cerrado'), default='Abierto')
     category = Column(String(100))
     requester_id = Column(String(36), ForeignKey("users.id"))
     assigned_technician_id = Column(String(36), ForeignKey("users.id"))

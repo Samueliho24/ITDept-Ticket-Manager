@@ -10,7 +10,8 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 - **Models are done** (`Backend/app/models/`): Users, Departments, Equipment, Tickets, TicketHistory, ChangeHistory
 - **Auth module done**: JWT login (HS256, bcrypt), RBAC dependencies (`get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles`). Endpoint: `POST /api/v1/auth/login`
 - **`schemas/`** now has `auth.py`; **`services/`** now has `auth_service.py`
-- **Business logic for tickets not yet written** — `samples/` contains an older invoice system that is NOT the current target. Do NOT build on `samples/`.
+- **Equipment and Tickets modules done**: Full CRUD with RBAC (RoleChecker), automatic `TicketHistory` + `ChangeHistory` audit per mutation. Endpoints: `/api/v1/equipment/` and `/api/v1/tickets/`.
+- **`samples/`** contains an older invoice system that is NOT the current target. Do NOT build on `samples/`.
 - **Frontend is a skeleton** — `App.jsx` is empty, `pages/`, `components/`, `api/` dirs are empty.
 - **No tests** yet.
 - **All user-facing messages must be in Spanish** (code in English).
@@ -23,7 +24,9 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 - DB driver is **pymysql** (pure Python, works with MariaDB/MySQL).
 - Passwords hashed with **bcrypt** via `passlib` (`hash_password` / `verify_password` in `core/security.py`).
 - Every write endpoint (POST/PATCH/DELETE) must log to `ChangeHistory`.
-- Reusable auth dependencies in `BackEnd/app/core/security.py`: `get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles([...])`.
+- Reusable auth dependencies in `BackEnd/app/core/security.py`: `get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles([...])`, `RoleChecker`.
+- RBAC cascade: `admin` inherits `technician` which inherits `resquestor`. Use `RoleChecker(["admin"])`, `RoleChecker(["admin","technician"])`, or `RoleChecker(["admin","technician","resquestor"])`.
+- Ticket status flow: `Abierto → Asignado → En Proceso → Pendiente → Resuelto → Cerrado`. Created as "Abierto", assigned sets "Asignado", status PATCH allows "En Proceso"/"Pendiente", resolve POST sets "Resuelto".
 
 ## Commands
 
@@ -62,11 +65,18 @@ Backend/
       change_history.py
     routers/
       auth.py           # POST /api/v1/auth/login
-      users.py          # Empty placeholder (old controller removed)
+      users.py          # Empty placeholder
+      equipments.py     # 6 endpoints: CRUD + transfer + status + list/detail
+      tickets.py        # 6 endpoints: CRUD + assign + status + resolve
     schemas/
       auth.py           # LoginRequest, TokenResponse, TokenData
+      equipment.py      # EquipmentCreate/Update/Location/Status/Response
+      ticket.py         # TicketCreate/Assign/StatusUpdate/Resolve/Response
+      history.py        # TicketHistoryResponse, ChangeHistoryResponse
     services/
       auth_service.py   # authenticate_user, login_service + audit log
+      equipment_service.py  # Full equipment CRUD + audit
+      ticket_service.py     # Full ticket lifecycle + TicketHistory + audit
   samples/              # OLD invoice system — do not build on this
   .env                  # DB credentials + SECRET (gitignored)
   venv/                 # Python venv
@@ -94,3 +104,4 @@ BackEnd -> Backend      # Symlink for package name
 - `Docs/Context_Master.md` — Master AI context (architecture, RBAC matrix, security rules).
 - `Docs/CONTEXT_AUTH_JWT.md` — Auth module spec (JWT payload, expiry, algorithm).
 - `Docs/Contexto_Proyecto_Tickets_TIC_LUZ_V4.md` — Detailed functional/non-functional requirements, use cases.
+- `Docs/context/CONTEXT_EQUIPMENT_TICKETS.md` — Equipment/Tickets module spec (RBAC cascade, endpoints, audit rules).

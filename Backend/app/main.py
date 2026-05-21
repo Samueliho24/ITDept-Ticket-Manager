@@ -24,7 +24,7 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
-app.include_router(equipments_router, prefix="/api/v1/equipments", tags=["Equipments"])
+app.include_router(equipments_router, prefix="/api/v1/equipment", tags=["Equipment"])
 app.include_router(tickets_router, prefix="/api/v1/tickets", tags=["Tickets"])
 
 

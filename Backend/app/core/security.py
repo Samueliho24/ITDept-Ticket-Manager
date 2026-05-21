@@ -93,3 +93,16 @@ def require_roles(allowed_roles: list):
             )
         return current_user
     return role_checker
+
+
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user: Users = Depends(get_current_active_user)) -> Users:
+        if current_user.role not in self.allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Acceso denegado. Se requiere rol: {', '.join(self.allowed_roles)}.",
+            )
+        return current_user
