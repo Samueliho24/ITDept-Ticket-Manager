@@ -11,6 +11,6 @@ class ChangeHistory(Base):
     affected_id = Column(String)
     register_id = Column(String)    
     details = Column(String)
-    dateChanged = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
     
     user = relationship("Users", foreign_keys=[user_id], back_populates="change_history")

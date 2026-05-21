@@ -1,7 +1,8 @@
+from ..samples import invoices, payments, students
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.db import engine, Base
-from .routers import students, users, invoices, payments
+from .app.routers import users
 from .controller import createDefaultAdmin
 
 app = FastAPI(title="TIC Tickets API", description="Sistema de gestion de Tickets para el departamento de TIC", version="1.0.0")
