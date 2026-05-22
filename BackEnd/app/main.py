@@ -5,7 +5,8 @@ from .routers.auth import router as auth_router
 from .routers.users import router as users_router
 from .routers.equipments import router as equipments_router
 from .routers.tickets import router as tickets_router
-from .routers.admin_management import router as admin_router
+from .routers.department import router as departments_router
+from .routers.audit import router as audit_router
 
 app = FastAPI(
     title="TIC Tickets API",
@@ -25,9 +26,10 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
-app.include_router(equipments_router, prefix="/api/v1/equipment", tags=["Equipment"])
+app.include_router(equipments_router, prefix="/api/v1/equipments", tags=["Equipment"])
 app.include_router(tickets_router, prefix="/api/v1/tickets", tags=["Tickets"])
-app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"])
+app.include_router(departments_router, prefix="/api/v1/departments", tags=["Departments"])
+app.include_router(audit_router, prefix="/api/v1/admin", tags=["Audit Logs"])
 
 
 @app.get("/")

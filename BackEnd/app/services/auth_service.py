@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import verify_password, create_access_token
 from BackEnd.app.models.users import Users
-from BackEnd.app.models.change_history import ChangeHistory
+from BackEnd.app.models.audit_log import AuditLog
 from BackEnd.app.schemas.auth import LoginRequest, TokenResponse
 
 def authenticate_user(db: Session, username: str, password: str) -> Users:
@@ -28,14 +28,14 @@ def authenticate_user(db: Session, username: str, password: str) -> Users:
     return user
 
 def register_login_audit(db: Session, user: Users):
-    audit = ChangeHistory(
+    audit = AuditLog(
         id=str(uuid.uuid4()),
         user_id=user.id,
         action="login",
-        affected_id=user.id,
-        register_id=user.id,
+        affected_table="users",
+        record_id=user.id,
         details="Inicio de sesión exitoso",
-        created_at=datetime.now(timezone.utc),
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(audit)
     db.commit()

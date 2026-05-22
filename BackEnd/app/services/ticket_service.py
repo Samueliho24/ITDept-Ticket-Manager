@@ -1,11 +1,10 @@
-import json
 import uuid
 from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from BackEnd.app.models.tickets import Tickets
 from BackEnd.app.models.history_tickets import TicketHistory
-from BackEnd.app.models.change_history import ChangeHistory
+from BackEnd.app.models.audit_log import AuditLog
 from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.ticket import (
@@ -41,14 +40,14 @@ def _register_audit(db: Session, user: Users, action: str, ticket: Tickets, extr
         "status": ticket.status,
         **(extra or {}),
     }
-    audit = ChangeHistory(
+    audit = AuditLog(
         id=str(uuid.uuid4()),
         user_id=user.id,
         action=action,
-        affected_id=ticket.id,
-        register_id=ticket.id,
-        details=json.dumps(details, default=str),
-        created_at=datetime.now(timezone.utc),
+        affected_table="tickets",
+        record_id=ticket.id,
+        details=details,
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(audit)
 

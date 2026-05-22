@@ -22,4 +22,4 @@ class Users(Base):
 
     tickets_requested = relationship("Tickets", foreign_keys="Tickets.requester_id", back_populates="requester")
 
-    change_history = relationship("ChangeHistory", back_populates="user")
+    audit_logs = relationship("AuditLog", back_populates="user")

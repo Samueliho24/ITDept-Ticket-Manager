@@ -1,29 +1,27 @@
-import json
 import uuid
 from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from BackEnd.app.models.users import Users
-from BackEnd.app.models.change_history import ChangeHistory
+from BackEnd.app.models.audit_log import AuditLog
 from BackEnd.app.core.security import hash_password
 from BackEnd.app.schemas.user import UserCreate, UserUpdate
 
 
 def _register_audit(db: Session, admin_id: str, action: str, user: Users, extra: dict = None):
     details = {
-        "affected_table": "users",
         "user_id": user.id,
         "username": user.username,
         **(extra or {}),
     }
-    audit = ChangeHistory(
+    audit = AuditLog(
         id=str(uuid.uuid4()),
         user_id=admin_id,
         action=action,
-        affected_id=user.id,
-        register_id=user.id,
-        details=json.dumps(details, default=str),
-        created_at=datetime.now(timezone.utc),
+        affected_table="users",
+        record_id=user.id,
+        details=details,
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(audit)
 

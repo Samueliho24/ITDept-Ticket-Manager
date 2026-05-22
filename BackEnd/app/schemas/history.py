@@ -16,14 +16,4 @@ class TicketHistoryResponse(BaseModel):
         from_attributes = True
 
 
-class ChangeHistoryResponse(BaseModel):
-    id: str
-    user_id: Optional[str] = None
-    action: Optional[str] = None
-    affected_id: Optional[str] = None
-    register_id: Optional[str] = None
-    details: Optional[str] = None
-    created_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
