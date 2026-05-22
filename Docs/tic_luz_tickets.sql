@@ -73,7 +73,7 @@ CREATE TABLE ticket_history (
 );
 
 -- Tabla de Logs de Auditoría
-CREATE TABLE audit_logs (
+CREATE TABLE change_history (
     id UUID PRIMARY KEY,
     user_id UUID,
     action VARCHAR(100),
