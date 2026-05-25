@@ -8,7 +8,7 @@ from BackEnd.app.core.security import hash_password
 from BackEnd.app.schemas.user import UserCreate, UserUpdate
 
 
-def _register_audit(db: Session, admin_id: str, action: str, user: Users, extra: dict = None):
+def _register_audit(db: Session, current_user: Users, action: str, user: Users, extra: dict = None):
     details = {
         "user_id": user.id,
         "username": user.username,
@@ -16,7 +16,7 @@ def _register_audit(db: Session, admin_id: str, action: str, user: Users, extra:
     }
     audit = AuditLog(
         id=str(uuid.uuid4()),
-        user_id=admin_id,
+        user_id=current_user.id,
         action=action,
         affected_table="users",
         record_id=user.id,
@@ -26,7 +26,7 @@ def _register_audit(db: Session, admin_id: str, action: str, user: Users, extra:
     db.add(audit)
 
 
-def create_user(db: Session, data: UserCreate, admin_id: str) -> Users:
+def create_user(db: Session, data: UserCreate, current_user: Users) -> Users:
     existing = db.query(Users).filter(Users.username == data.username).first()
     if existing:
         raise HTTPException(
@@ -46,13 +46,13 @@ def create_user(db: Session, data: UserCreate, admin_id: str) -> Users:
     )
     db.add(user)
     db.flush()
-    _register_audit(db, admin_id, "CREATE_USER", user)
+    _register_audit(db, current_user, "CREATE_USER", user)
     db.commit()
     db.refresh(user)
     return user
 
 
-def update_user(db: Session, user_id: str, data: UserUpdate, admin_id: str) -> Users:
+def update_user(db: Session, user_id: str, data: UserUpdate, current_user: Users) -> Users:
     user = db.query(Users).filter(Users.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -67,13 +67,13 @@ def update_user(db: Session, user_id: str, data: UserUpdate, admin_id: str) -> U
         if old_value != value:
             changed[field] = {"from": str(old_value), "to": str(value)}
     if changed:
-        _register_audit(db, admin_id, "UPDATE_USER", user, {"changes": changed})
+        _register_audit(db, current_user, "UPDATE_USER", user, {"changes": changed})
     db.commit()
     db.refresh(user)
     return user
 
 
-def toggle_user_status(db: Session, user_id: str, active: bool, admin_id: str) -> Users:
+def toggle_user_status(db: Session, user_id: str, active: bool, current_user: Users) -> Users:
     user = db.query(Users).filter(Users.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -82,7 +82,7 @@ def toggle_user_status(db: Session, user_id: str, active: bool, admin_id: str) -
         )
     old_status = user.active
     user.active = active
-    _register_audit(db, admin_id, "TOGGLE_USER_STATUS", user, {
+    _register_audit(db, current_user, "TOGGLE_USER_STATUS", user, {
         "from_active": old_status,
         "to_active": active,
     })
@@ -91,7 +91,7 @@ def toggle_user_status(db: Session, user_id: str, active: bool, admin_id: str) -
     return user
 
 
-def change_user_password(db: Session, user_id: str, new_password: str, admin_id: str) -> Users:
+def change_user_password(db: Session, user_id: str, new_password: str, current_user: Users) -> Users:
     user = db.query(Users).filter(Users.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -99,7 +99,24 @@ def change_user_password(db: Session, user_id: str, new_password: str, admin_id:
             detail="Usuario no encontrado.",
         )
     user.password = hash_password(new_password)
-    _register_audit(db, admin_id, "CHANGE_USER_PASSWORD", user)
+    _register_audit(db, current_user, "CHANGE_USER_PASSWORD", user)
     db.commit()
     db.refresh(user)
+    return user
+
+
+def list_users(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Users], int]:
+    query = db.query(Users).order_by(Users.created_at.desc())
+    total = query.count()
+    items = query.offset(offset).limit(limit).all()
+    return items, total
+
+
+def get_user(db: Session, user_id: str) -> Users:
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado.",
+        )
     return user

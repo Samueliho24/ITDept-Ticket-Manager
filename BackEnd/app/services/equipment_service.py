@@ -115,8 +115,11 @@ def update_equipment_status(db: Session, equipment_id: str, data: EquipmentStatu
     return equipment
 
 
-def list_equipment(db: Session) -> list[Equipment]:
-    return db.query(Equipment).order_by(Equipment.entry_date.desc()).all()
+def list_equipment(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Equipment], int]:
+    query = db.query(Equipment).order_by(Equipment.entry_date.desc())
+    total = query.count()
+    items = query.offset(offset).limit(limit).all()
+    return items, total
 
 
 def get_equipment(db: Session, equipment_id: str) -> Equipment:

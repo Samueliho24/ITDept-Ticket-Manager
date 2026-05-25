@@ -82,11 +82,14 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
     return ticket
 
 
-def list_tickets(db: Session, current_user: Users) -> list[Tickets]:
+def list_tickets(db: Session, current_user: Users, limit: int = 10, offset: int = 0) -> tuple[list[Tickets], int]:
     query = db.query(Tickets)
     if current_user.role == "resquestor":
         query = query.filter(Tickets.requester_id == current_user.id)
-    return query.order_by(Tickets.opened_at.desc()).all()
+    query = query.order_by(Tickets.opened_at.desc())
+    total = query.count()
+    items = query.offset(offset).limit(limit).all()
+    return items, total
 
 
 def get_ticket(db: Session, ticket_id: str, current_user: Users) -> Tickets:

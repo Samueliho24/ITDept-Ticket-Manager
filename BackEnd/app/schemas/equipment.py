@@ -39,7 +39,6 @@ class EquipmentResponse(BaseModel):
     department_id: Optional[str] = None
     entry_date: Optional[datetime] = None
     out_date: Optional[datetime] = None
-    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -8,17 +8,17 @@ from BackEnd.app.models.users import Users
 
 def get_audit_logs_paginated(
     db: Session,
-    page: int = 1,
-    size: int = 20,
+    limit: int = 10,
+    offset: int = 0,
     start_date: str = None,
     end_date: str = None,
     username_query: str = None,
     action_filter: str = None,
 ):
-    if page < 1:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La página debe ser mayor o igual a 1.")
-    if size < 1:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El tamaño debe ser mayor o igual a 1.")
+    if limit < 1:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El límite debe ser mayor o igual a 1.")
+    if offset < 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El offset debe ser mayor o igual a 0.")
 
     query = db.query(AuditLog).join(Users, AuditLog.user_id == Users.id)
 
@@ -43,13 +43,12 @@ def get_audit_logs_paginated(
     if action_filter:
         query = query.filter(AuditLog.action == action_filter)
 
-    total_records = query.count()
-    pages = max(1, (total_records + size - 1) // size)
+    total = query.count()
 
     logs = (
         query.order_by(AuditLog.timestamp.desc())
-        .offset((page - 1) * size)
-        .limit(size)
+        .offset(offset)
+        .limit(limit)
         .all()
     )
 
@@ -69,4 +68,4 @@ def get_audit_logs_paginated(
             }
         )
 
-    return items, total_records, page, pages, size
+    return items, total

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import get_current_active_user, RoleChecker
@@ -6,6 +6,7 @@ from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.ticket import (
     TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve, TicketResponse,
 )
+from BackEnd.app.schemas.pagination import TicketPaginated
 from BackEnd.app.services.ticket_service import (
     create_ticket, list_tickets, get_ticket,
     assign_ticket, update_ticket_status, resolve_ticket,
@@ -23,12 +24,15 @@ def create_ticket_endpoint(
     return create_ticket(db, data, current_user)
 
 
-@router.get("/", response_model=list[TicketResponse])
+@router.get("/", response_model=TicketPaginated)
 def list_tickets_endpoint(
+    limit: int = Query(10, ge=1, le=100, description="Registros por página"),
+    offset: int = Query(0, ge=0, description="Desplazamiento"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(get_current_active_user),
 ):
-    return list_tickets(db, current_user)
+    items, total = list_tickets(db, current_user, limit, offset)
+    return TicketPaginated(total=total, limit=limit, offset=offset, items=items)
 
 
 @router.get("/{ticket_id}", response_model=TicketResponse)

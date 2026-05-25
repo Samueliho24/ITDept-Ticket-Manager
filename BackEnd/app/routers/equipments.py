@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import get_current_active_user, RoleChecker
@@ -7,6 +7,7 @@ from BackEnd.app.schemas.equipment import (
     EquipmentCreate, EquipmentUpdate,
     EquipmentLocationUpdate, EquipmentStatusUpdate, EquipmentResponse,
 )
+from BackEnd.app.schemas.pagination import EquipmentPaginated
 from BackEnd.app.services.equipment_service import (
     create_equipment, update_equipment, transfer_equipment,
     update_equipment_status, list_equipment, get_equipment,
@@ -54,12 +55,15 @@ def change_equipment_status_endpoint(
     return update_equipment_status(db, equipment_id, data, current_user)
 
 
-@router.get("/", response_model=list[EquipmentResponse])
+@router.get("/", response_model=EquipmentPaginated)
 def list_equipment_endpoint(
+    limit: int = Query(10, ge=1, le=100, description="Registros por página"),
+    offset: int = Query(0, ge=0, description="Desplazamiento"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin", "technician"])),
 ):
-    return list_equipment(db)
+    items, total = list_equipment(db, limit, offset)
+    return EquipmentPaginated(total=total, limit=limit, offset=offset, items=items)
 
 
 @router.get("/{equipment_id}", response_model=EquipmentResponse)

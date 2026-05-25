@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.db import engine, Base
@@ -8,10 +9,16 @@ from .routers.tickets import router as tickets_router
 from .routers.department import router as departments_router
 from .routers.audit import router as audit_router
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
 app = FastAPI(
     title="TIC Tickets API",
     description="Sistema de gestión de Tickets para el departamento de TIC",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -21,8 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])

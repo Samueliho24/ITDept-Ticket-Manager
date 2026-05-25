@@ -13,11 +13,3 @@ class AuditLogResponse(BaseModel):
     record_id: Optional[str] = None
     details: Optional[Dict[str, Any]] = None
     timestamp: Optional[datetime] = None
-
-
-class AuditLogPaginated(BaseModel):
-    items: list[AuditLogResponse]
-    total_records: int
-    page: int
-    pages: int
-    size: int
