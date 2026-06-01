@@ -5,8 +5,11 @@
 
 # User files
 Backend/samples
-Docs/context
-Docs/prompt
+Docs/
+!Docs/tic_tickets.sql
+!Docs/api
+
+
 
 
 # User-specific files
