@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .core.db import engine, Base
+from .core.db import engine, Base, SessionLocal
+from .core.userDefault import default_admin
 from .routers.auth import router as auth_router
 from .routers.users import router as users_router
 from .routers.equipments import router as equipments_router
@@ -12,6 +13,11 @@ from .routers.audit import router as audit_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        default_admin(db)
+    finally:
+        db.close()
     yield
 
 app = FastAPI(
