@@ -26,7 +26,7 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page login-gradient-bg">
       <div className="card">
         <div className="header">
           <div className='log-zone'>

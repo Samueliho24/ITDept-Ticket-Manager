@@ -8,20 +8,23 @@ const { useBreakpoint } = Grid;
 
 export default function MainLayout() {
   const screens = useBreakpoint();
-  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isMobile = !screens.md;
-  const isTablet = !screens.lg && screens.md;
+  const isMobile = !screens.lg;
+
+  const handleAction = (action) => {
+    if (action === 'reportTicket') {
+      // TODO: Abrir modal de reporte de ticket
+    }
+  };
 
   return (
     <div className="layout">
       <Sidebar
-        collapsed={isTablet ? true : collapsed}
-        onToggle={() => setCollapsed(!collapsed)}
         isMobile={isMobile}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
+        onAction={handleAction}
       />
       <div className="main-content">
         <Header
