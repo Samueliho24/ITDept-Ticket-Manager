@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Breadcrumb, Badge, Input } from 'antd';
+import { useState, useRef, useEffect, useCallback, startTransition } from 'react';
+import { Breadcrumb, Badge, Input, Popover, List, Empty, Spin } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, Bell, Search } from 'lucide-react';
+import { getNotifications, markAsRead } from '../services/notificationService';
+import { useModals } from '../context/ModalContext';
 
 const breadcrumbMap = {
   '/dashboard': { section: 'PRINCIPAL', item: 'Inicio' },
@@ -18,8 +20,82 @@ export default function Header({ onMenuClick, isMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [notifications, setNotifications] = useState([]);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const { openDetail } = useModals();
+  const pollRef = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.read_at).length;
+
+  const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
+    try {
+      const res = await getNotifications({ limit: 20 });
+      setNotifications(res.data.items || []);
+    } catch {
+      setNotifications([]);
+    } finally {
+      setNotifLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    startTransition(() => { fetchNotifications(); });
+    pollRef.current = setInterval(() => {
+      startTransition(() => { fetchNotifications(); });
+    }, 30000);
+    return () => clearInterval(pollRef.current);
+  }, [fetchNotifications]);
+
+  const handleMarkRead = async (notif) => {
+    try {
+      await markAsRead(notif.id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n))
+      );
+      openDetail(notif.ticket);
+    } catch {
+      openDetail(notif.ticket);
+    }
+    setNotifOpen(false);
+  };
+
+  const handleSearch = (value) => {
+    if (!value.trim()) return;
+    navigate('/history', { state: { search: value.trim() } });
+  };
 
   const current = breadcrumbMap[location.pathname] || null;
+
+  const notifContent = (
+    <div className="notif-dropdown">
+      {notifLoading && notifications.length === 0 ? (
+        <div className="notif-loading"><Spin size="small" /></div>
+      ) : notifications.length === 0 ? (
+        <Empty description="Sin notificaciones" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      ) : (
+        <List
+          dataSource={notifications.slice(0, 10)}
+          renderItem={(item) => (
+            <List.Item
+              className={`notif-item${item.read_at ? ' read' : ' unread'}`}
+              onClick={() => handleMarkRead(item)}
+            >
+              <div className="notif-item-content">
+                <div className="notif-msg">{item.message}</div>
+                <div className="notif-date">
+                  {item.created_at ? new Date(item.created_at).toLocaleDateString('es-ES') : ''}
+                </div>
+              </div>
+              {!item.read_at && <span className="notif-dot" />}
+            </List.Item>
+          )}
+        />
+      )}
+    </div>
+  );
 
   return (
     <header className="header gradient-header">
@@ -58,7 +134,9 @@ export default function Header({ onMenuClick, isMobile }) {
               variant="borderless"
               style={{ color: 'rgba(255,255,255,0.6)' }}
               size={16}
-              onSearch={() => {}}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onSearch={handleSearch}
             />
           ) : (
             <button
@@ -70,9 +148,18 @@ export default function Header({ onMenuClick, isMobile }) {
               <Search size={20} />
             </button>
           )}
-          <Badge count={3} size="small" className="notification-badge" offset={[-2, 2]}>
-            <Bell size={20} className="notification-icon" />
-          </Badge>
+          <Popover
+            content={notifContent}
+            trigger="click"
+            open={notifOpen}
+            onOpenChange={(v) => { setNotifOpen(v); if (v) fetchNotifications(); }}
+            placement="bottomRight"
+            overlayClassName="notif-popover"
+          >
+            <Badge count={unreadCount} size="small" className="notification-badge" offset={[-2, 2]}>
+              <Bell size={20} className="notification-icon" />
+            </Badge>
+          </Popover>
         </div>
       </div>
       {isMobile && searchOpen && (
@@ -83,7 +170,9 @@ export default function Header({ onMenuClick, isMobile }) {
             style={{ color: 'rgba(255,255,255,0.6)' }}
             prefix={<Search size={16} />}
             className="mobile-search-input"
-            onPressEnter={() => {}}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onPressEnter={() => handleSearch(searchText)}
           />
         </div>
       )}

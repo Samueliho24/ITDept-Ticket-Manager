@@ -4,7 +4,7 @@ export const ticketStatusList = [
   { label: 'En Proceso', value: 'En Proceso' },
   { label: 'Pendiente', value: 'Pendiente' },
   { label: 'Resuelto', value: 'Resuelto' },
-  { label: 'Cerrado', value: 'Cerrado' },
+  { label: 'Anulado', value: 'Anulado' },
 ];
 
 export const priorityList = [

@@ -1,22 +1,32 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Grid } from 'antd';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { ModalProvider, useModals } from '../context/ModalContext';
+import ReportTicketModal from '../pages/requestor/modals/ReportTicketModal';
+import TicketDetailModal from '../pages/requestor/modals/TicketDetailModal';
+import CancelTicketModal from '../pages/requestor/modals/CancelTicketModal';
 
 const { useBreakpoint } = Grid;
 
-export default function MainLayout() {
+function LayoutInner() {
   const screens = useBreakpoint();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const { openReport } = useModals();
 
   const isMobile = !screens.lg;
 
-  const handleAction = (action) => {
+  const handleAction = useCallback((action) => {
     if (action === 'reportTicket') {
-      // TODO: Abrir modal de reporte de ticket
+      openReport();
     }
-  };
+  }, [openReport]);
+
+  const handleSuccess = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
 
   return (
     <div className="layout">
@@ -32,9 +42,20 @@ export default function MainLayout() {
           isMobile={isMobile}
         />
         <div className="page-content">
-          <Outlet />
+          <Outlet context={{ refreshKey }} />
         </div>
       </div>
+      <ReportTicketModal onSuccess={handleSuccess} />
+      <TicketDetailModal />
+      <CancelTicketModal onSuccess={handleSuccess} />
     </div>
+  );
+}
+
+export default function MainLayout() {
+  return (
+    <ModalProvider>
+      <LayoutInner />
+    </ModalProvider>
   );
 }
