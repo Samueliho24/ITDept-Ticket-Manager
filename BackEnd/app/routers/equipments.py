@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
@@ -59,10 +60,13 @@ def change_equipment_status_endpoint(
 def list_equipment_endpoint(
     limit: int = Query(10, ge=1, le=100, description="Registros por página"),
     offset: int = Query(0, ge=0, description="Desplazamiento"),
+    search: Optional[str] = Query(None, description="Búsqueda por código, marca o modelo"),
+    equipment_type: Optional[str] = Query(None, description="Filtrar por tipo de equipo"),
+    status: Optional[str] = Query(None, description="Filtrar por estado"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin", "technician"])),
 ):
-    items, total = list_equipment(db, limit, offset)
+    items, total = list_equipment(db, limit, offset, search=search, equipment_type=equipment_type, status=status)
     return EquipmentPaginated(total=total, limit=limit, offset=offset, items=items)
 
 

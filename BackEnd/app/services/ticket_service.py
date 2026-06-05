@@ -3,18 +3,48 @@ from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from BackEnd.app.models.tickets import Tickets
 from BackEnd.app.models.history_tickets import TicketHistory
 from BackEnd.app.models.ticket_ratings import TicketRating
 from BackEnd.app.models.audit_log import AuditLog
 from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.users import Users
+from BackEnd.app.models.departments import Departments
 from BackEnd.app.schemas.ticket import (
     TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve, TicketCancel,
 )
 from BackEnd.app.schemas.rating import RateRequest, RatingResponse
 from BackEnd.app.services.notification_service import create_notification
+
+def _enrich_tickets_with_names(db: Session, tickets: list[Tickets]):
+    user_ids = set()
+    dept_ids = set()
+    for t in tickets:
+        if t.requester_id:
+            user_ids.add(t.requester_id)
+        if t.assigned_technician_id:
+            user_ids.add(t.assigned_technician_id)
+        if t.department_id:
+            dept_ids.add(t.department_id)
+    if user_ids:
+        users = {u.id: u for u in db.query(Users).filter(Users.id.in_(user_ids)).all()}
+        for t in tickets:
+            req = users.get(t.requester_id)
+            t.requester_name = f"{req.name} {req.lastname}" if req else None
+            tech = users.get(t.assigned_technician_id)
+            t.assigned_to_name = f"{tech.name} {tech.lastname}" if tech else None
+    if dept_ids:
+        depts = {d.id: d for d in db.query(Departments).filter(Departments.id.in_(dept_ids)).all()}
+        for t in tickets:
+            d = depts.get(t.department_id)
+            t.department_name = d.name if d else None
+            t.ticket_number = (
+                f"{d.code}-{t.opened_at.strftime('%d%m%y')}-{t.daily_sequence:02d}"
+                if d and t.opened_at and t.daily_sequence is not None
+                else None
+            )
+
 
 ALLOWED_TRANSITIONS = {
     "En Proceso": True,
@@ -68,6 +98,19 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
         equipment = db.query(Equipment).filter(Equipment.id == data.equipment_id).first()
         if not equipment:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Equipo no encontrado.")
+    now = datetime.now(timezone.utc)
+    if data.department_id:
+        max_seq = (
+            db.query(func.max(Tickets.daily_sequence))
+            .filter(
+                Tickets.department_id == data.department_id,
+                func.date(Tickets.opened_at) == now.date(),
+            )
+            .scalar()
+        )
+        daily_sequence = (max_seq or 0) + 1
+    else:
+        daily_sequence = 1
     ticket = Tickets(
         id=str(uuid.uuid4()),
         title=data.title,
@@ -78,12 +121,14 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
         requester_id=current_user.id,
         equipment_id=data.equipment_id,
         department_id=data.department_id,
-        opened_at=datetime.now(timezone.utc),
+        daily_sequence=daily_sequence,
+        opened_at=now,
     )
     db.add(ticket)
     db.flush()
     _register_ticket_history(db, ticket, None, "Abierto")
     _register_audit(db, current_user, "create_ticket", ticket)
+    ticket.requester_name = f"{current_user.name} {current_user.lastname}" if current_user.name else current_user.username
     db.commit()
     db.refresh(ticket)
     return ticket
@@ -99,6 +144,7 @@ def list_tickets(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     search: Optional[str] = None,
+    equipment_id: Optional[str] = None,
 ) -> tuple[list[Tickets], int]:
     query = db.query(Tickets)
     if current_user.role == "resquestor":
@@ -125,9 +171,12 @@ def list_tickets(
                 Tickets.description.ilike(f"%{search}%"),
             )
         )
+    if equipment_id:
+        query = query.filter(Tickets.equipment_id == equipment_id)
     query = query.order_by(Tickets.opened_at.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()
+    _enrich_tickets_with_names(db, items)
     return items, total
 
 
@@ -140,6 +189,7 @@ def get_ticket(db: Session, ticket_id: str, current_user: Users) -> Tickets:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tiene permiso para ver este ticket.",
         )
+    _enrich_tickets_with_names(db, [ticket])
     return ticket
 
 
@@ -180,6 +230,11 @@ def assign_ticket(db: Session, ticket_id: str, data: TicketAssign, current_user:
         db, ticket.requester_id, ticket.id,
         f"Tu ticket #{ticket.id[:8]} ha sido asignado a {technician.name} {technician.lastname}.",
     )
+    create_notification(
+        db, technician.id, ticket.id,
+        f"Se te ha asignado un nuevo ticket de soporte.",
+    )
+    _enrich_tickets_with_names(db, [ticket])
     db.commit()
     db.refresh(ticket)
     return ticket
@@ -207,6 +262,7 @@ def update_ticket_status(db: Session, ticket_id: str, data: TicketStatusUpdate, 
             db, ticket.requester_id, ticket.id,
             f"Tu ticket #{ticket.id[:8]} cambió a '{data.status}'.",
         )
+    _enrich_tickets_with_names(db, [ticket])
     db.commit()
     db.refresh(ticket)
     return ticket
@@ -254,6 +310,7 @@ def resolve_ticket(db: Session, ticket_id: str, data: TicketResolve, current_use
         db, ticket.requester_id, ticket.id,
         f"Tu ticket #{ticket.id[:8]} ha sido resuelto. ¡Califica el servicio!",
     )
+    _enrich_tickets_with_names(db, [ticket])
     db.commit()
     db.refresh(ticket)
     return ticket
@@ -281,6 +338,7 @@ def cancel_ticket(db: Session, ticket_id: str, data: TicketCancel, current_user:
         "new_status": "Anulado",
         "reason": data.reason,
     })
+    _enrich_tickets_with_names(db, [ticket])
     db.commit()
     db.refresh(ticket)
     return ticket

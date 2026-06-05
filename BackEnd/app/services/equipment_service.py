@@ -1,7 +1,9 @@
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.departments import Departments
 from BackEnd.app.models.audit_log import AuditLog
@@ -115,10 +117,40 @@ def update_equipment_status(db: Session, equipment_id: str, data: EquipmentStatu
     return equipment
 
 
-def list_equipment(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Equipment], int]:
-    query = db.query(Equipment).order_by(Equipment.entry_date.desc())
+def _enrich_equipment_with_department(db: Session, items: list[Equipment]):
+    dept_ids = {e.department_id for e in items if e.department_id}
+    if dept_ids:
+        depts = {d.id: d for d in db.query(Departments).filter(Departments.id.in_(dept_ids)).all()}
+        for e in items:
+            d = depts.get(e.department_id)
+            e.department_name = d.name if d else None
+
+
+def list_equipment(
+    db: Session,
+    limit: int = 10,
+    offset: int = 0,
+    search: Optional[str] = None,
+    equipment_type: Optional[str] = None,
+    status: Optional[str] = None,
+) -> tuple[list[Equipment], int]:
+    query = db.query(Equipment)
+    if search:
+        query = query.filter(
+            or_(
+                Equipment.inventory_code.ilike(f"%{search}%"),
+                Equipment.brand.ilike(f"%{search}%"),
+                Equipment.model.ilike(f"%{search}%"),
+            )
+        )
+    if equipment_type:
+        query = query.filter(Equipment.equipment_type == equipment_type)
+    if status:
+        query = query.filter(Equipment.status == status)
+    query = query.order_by(Equipment.entry_date.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()
+    _enrich_equipment_with_department(db, items)
     return items, total
 
 
@@ -126,4 +158,5 @@ def get_equipment(db: Session, equipment_id: str) -> Equipment:
     equipment = db.query(Equipment).filter(Equipment.id == equipment_id).first()
     if not equipment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Equipo no encontrado.")
+    _enrich_equipment_with_department(db, [equipment])
     return equipment

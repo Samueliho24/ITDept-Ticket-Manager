@@ -8,7 +8,7 @@ class NotificationResponse(BaseModel):
     user_id: str
     ticket_id: str
     message: str
-    read: bool = False
+    read_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
 
     class Config:

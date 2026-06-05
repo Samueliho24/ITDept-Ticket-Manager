@@ -79,9 +79,7 @@ export default function TicketDetailModal() {
             {detailTicket.assigned_to_name && (
               <Descriptions.Item label="Técnico Asignado">{detailTicket.assigned_to_name}</Descriptions.Item>
             )}
-            {detailTicket.solution && (
-              <Descriptions.Item label="Solución">{detailTicket.solution}</Descriptions.Item>
-            )}
+
           </Descriptions>
 
           <div className="detail-section">
@@ -105,11 +103,11 @@ export default function TicketDetailModal() {
                 items={history.map((h) => ({
                   children: (
                     <div className="timeline-item">
-                      <span className="timeline-action">{h.action}</span>
+                      <span className="timeline-action">{h.technical_action || h.new_status || 'Actualización'}</span>
                       {h.reason && <span className="timeline-reason">: {h.reason}</span>}
-                      <span className="timeline-user">{h.performed_by_name || ''}</span>
+                      {h.technical_comment && <span className="timeline-reason"> — {h.technical_comment}</span>}
                       <span className="timeline-date">
-                        {h.created_at ? new Date(h.created_at).toLocaleString('es-ES') : ''}
+                        {h.change_date ? new Date(h.change_date).toLocaleString('es-ES') : ''}
                       </span>
                     </div>
                   ),

@@ -4,7 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User files
-Backend/samples
+BackEnd/samples
+FrontEnd/samples
+samples
 Docs/
 !Docs/tic_tickets.sql
 !Docs/api

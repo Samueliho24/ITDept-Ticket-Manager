@@ -1,14 +1,34 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
-import { Card, Button, Empty, Spin } from 'antd';
-import { PlusCircle, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Tag, Button, Spin, Empty, Tooltip } from 'antd';
+import { PlusCircle, Eye, XCircle } from 'lucide-react';
 import { listTickets } from '../../services/ticketService';
 import { useModals } from '../../context/ModalContext';
 
-const STATUS_ICONS = {
-  Abierto: <AlertCircle size={18} />,
-  'En Proceso': <Clock size={18} />,
-  Resuelto: <CheckCircle size={18} />,
+const STATUS_TAG_COLOR = {
+  Abierto: 'red',
+  Asignado: 'orange',
+  'En Proceso': 'gold',
+  Pendiente: 'geekblue',
+  Resuelto: 'green',
+  Cerrado: 'default',
+  Anulado: 'default',
 };
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function getDaysElapsed(dateStr) {
+  if (!dateStr) return 0;
+  const then = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now - then) / (1000 * 60 * 60 * 24));
+}
 
 export default function RequestorDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -35,20 +55,11 @@ export default function RequestorDashboard() {
     startTransition(() => { fetchTickets(); });
   }, [fetchTickets]);
 
-  const statusColor = (status) => {
-    switch (status) {
-      case 'Abierto': return '#860404';
-      case 'En Proceso': return '#D0A021';
-      case 'Resuelto': return '#1A8C06';
-      default: return '#64748B';
-    }
-  };
-
   return (
     <div className="requestor-dashboard">
       <div className="dashboard-header">
         <h2>Mis Tickets</h2>
-        <Button type="primary" icon={<PlusCircle size={16} />} onClick={openReport} className="btn-reportar">
+        <Button type="primary" icon={<PlusCircle size={16} />} onClick={openReport}>
           Reportar Falla
         </Button>
       </div>
@@ -58,38 +69,60 @@ export default function RequestorDashboard() {
       ) : tickets.length === 0 ? (
         <Empty description="No tienes tickets registrados" />
       ) : (
-        <div className="dashboard-cards">
-          {tickets.map((ticket) => (
-            <Card
-              key={ticket.id}
-              className="ticket-card"
-              hoverable
-              onClick={() => openDetail(ticket)}
-            >
-              <div className="card-header">
-                <span className="card-id">#{ticket.id.slice(0, 8)}</span>
-                <span className="card-status" style={{ color: statusColor(ticket.status) }}>
-                  {STATUS_ICONS[ticket.status] || null}
-                  {ticket.status}
-                </span>
+        <div className="ticket-list-body">
+          {tickets.map((ticket) => {
+            const days = getDaysElapsed(ticket.opened_at);
+            return (
+              <div key={ticket.id} className="ticket-row">
+                {/* Col 1 — Código + Categoría */}
+                <div className="ticket-col ticket-col-info">
+                  <div className="ticket-number">{ticket.ticket_number}</div>
+                  <div className="ticket-solicitante">{ticket.category || 'Sin categoría'}</div>
+                </div>
+
+                {/* Col 2 — Departamento */}
+                <div className="ticket-col ticket-col-dept">
+                  <span className="ticket-dept-name">{ticket.department_name || '—'}</span>
+                </div>
+
+                {/* Col 3 — Estado */}
+                <div className="ticket-col ticket-col-status">
+                  <Tag color={STATUS_TAG_COLOR[ticket.status] || 'default'}>{ticket.status}</Tag>
+                </div>
+
+                {/* Col 4 — Fecha + Días */}
+                <div className="ticket-col ticket-col-date">
+                  <div className="ticket-date">{formatDate(ticket.opened_at)}</div>
+                  <div className={`ticket-days ${days >= 5 ? 'stale' : ''}`}>
+                    {days} {days === 1 ? 'Día' : 'Días'}
+                  </div>
+                </div>
+
+                {/* Col 5 — Acción */}
+                <div className="ticket-col ticket-col-action">
+                  <Tooltip title="Ver detalles">
+                    <Button
+                      type="text"
+                      icon={<Eye size={18} />}
+                      className="btn-view"
+                      onClick={() => openDetail(ticket)}
+                    />
+                  </Tooltip>
+                  {ticket.status === 'Abierto' && (
+                    <Button
+                      size="small"
+                      danger
+                      icon={<XCircle size={14} />}
+                      className="btn-cancel-ticket"
+                      onClick={(e) => { e.stopPropagation(); openCancel(ticket); }}
+                    >
+                      Anular
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="card-title">{ticket.title}</div>
-              <div className="card-meta">
-                <span>{ticket.category || 'Sin categoría'}</span>
-                <span className="card-priority">{ticket.priority}</span>
-              </div>
-              {ticket.status === 'Abierto' && (
-                <Button
-                  size="small"
-                  danger
-                  className="card-cancel-btn"
-                  onClick={(e) => { e.stopPropagation(); openCancel(ticket); }}
-                >
-                  Anular
-                </Button>
-              )}
-            </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

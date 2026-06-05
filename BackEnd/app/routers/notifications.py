@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
+from typing import List
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import get_current_active_user
 from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.notification import NotificationPaginated
 from BackEnd.app.services.notification_service import (
-    list_notifications, mark_as_read,
+    list_notifications, mark_as_read, StaleAlert, get_stale_alerts,
 )
 
 router = APIRouter()
@@ -37,3 +38,11 @@ def mark_notification_read_endpoint(
         return {"ok": True, "id": notif.id}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/stale-alerts", response_model=List[StaleAlert])
+def list_stale_alerts_endpoint(
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(get_current_active_user),
+):
+    return get_stale_alerts(db, current_user)

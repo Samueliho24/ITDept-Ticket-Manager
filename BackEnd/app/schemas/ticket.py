@@ -42,6 +42,10 @@ class TicketResponse(BaseModel):
     equipment_id: Optional[str] = None
     department_id: Optional[str] = None
     rated: bool = False
+    requester_name: Optional[str] = None
+    assigned_to_name: Optional[str] = None
+    department_name: Optional[str] = None
+    ticket_number: Optional[str] = None
     opened_at: Optional[datetime] = None
     closed_at: Optional[datetime] = None
 

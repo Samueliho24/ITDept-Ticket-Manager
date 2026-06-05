@@ -17,6 +17,7 @@ class Tickets(Base):
     equipment_id = Column(String(36), ForeignKey("equipment.id"))
     department_id = Column(String(36), ForeignKey("departments.id"), nullable=True)
     rated = Column(Boolean, default=False)
+    daily_sequence = Column(Integer, default=0)
     opened_at = Column(DateTime, default=datetime.datetime.utcnow)
     closed_at = Column(DateTime, nullable=True)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from BackEnd.app.core.db import Base
 import datetime, uuid
@@ -8,7 +8,10 @@ class Departments(Base):
 
     id = Column(String(36), primary_key=True, index=True, nullable=False, default=lambda: str(uuid.uuid4()))
     name = Column(String(100), nullable=False)
+    code = Column(String(3), unique=True, nullable=False)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    deleted_at = Column(DateTime, nullable=True)
 
     user = relationship("Users", back_populates="department")
     equipment = relationship("Equipment", back_populates="department")

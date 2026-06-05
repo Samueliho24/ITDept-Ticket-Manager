@@ -38,6 +38,7 @@ def list_tickets_endpoint(
     date_from: Optional[str] = Query(None, description="Fecha inicial (YYYY-MM-DD)"),
     date_to: Optional[str] = Query(None, description="Fecha final (YYYY-MM-DD)"),
     search: Optional[str] = Query(None, description="Búsqueda por texto en título/descripción"),
+    equipment_id: Optional[str] = Query(None, description="Filtrar por equipo"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(get_current_active_user),
 ):
@@ -45,7 +46,7 @@ def list_tickets_endpoint(
         db, current_user, limit, offset,
         status=status, category=category,
         date_from=date_from, date_to=date_to,
-        search=search,
+        search=search, equipment_id=equipment_id,
     )
     return TicketPaginated(total=total, limit=limit, offset=offset, items=items)
 

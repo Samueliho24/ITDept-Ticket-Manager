@@ -14,6 +14,7 @@ class Equipment(Base):
     technical_specifications = Column(JSON)
     status = Column(String(50), default="Operativo")
     department_id = Column(String(36), ForeignKey("departments.id"))
+    assigned_person = Column(String(200), nullable=True)
     entry_date = Column(DateTime, default=datetime.datetime.utcnow)
     out_date = Column(DateTime, nullable=True)
 

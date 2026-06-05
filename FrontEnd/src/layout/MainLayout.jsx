@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 import { Grid } from 'antd';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -7,6 +7,7 @@ import { ModalProvider, useModals } from '../context/ModalContext';
 import ReportTicketModal from '../pages/requestor/modals/ReportTicketModal';
 import TicketDetailModal from '../pages/requestor/modals/TicketDetailModal';
 import CancelTicketModal from '../pages/requestor/modals/CancelTicketModal';
+import EquipmentDetailModal from '../pages/technician/modals/EquipmentDetailModal';
 
 const { useBreakpoint } = Grid;
 
@@ -14,6 +15,7 @@ function LayoutInner() {
   const screens = useBreakpoint();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [equipDetail, setEquipDetail] = useState(null);
   const { openReport } = useModals();
 
   const isMobile = !screens.lg;
@@ -26,6 +28,10 @@ function LayoutInner() {
 
   const handleSuccess = useCallback(() => {
     setRefreshKey((k) => k + 1);
+  }, []);
+
+  const handleViewEquipment = useCallback((eq) => {
+    setEquipDetail(eq);
   }, []);
 
   return (
@@ -42,14 +48,23 @@ function LayoutInner() {
           isMobile={isMobile}
         />
         <div className="page-content">
-          <Outlet context={{ refreshKey }} />
+          <Outlet context={{ refreshKey, onViewEquipment: handleViewEquipment }} />
         </div>
       </div>
       <ReportTicketModal onSuccess={handleSuccess} />
       <TicketDetailModal />
       <CancelTicketModal onSuccess={handleSuccess} />
+      <EquipmentDetailModal
+        equipment={equipDetail}
+        open={!!equipDetail}
+        onClose={() => setEquipDetail(null)}
+      />
     </div>
   );
+}
+
+export function useLayoutContext() {
+  return useOutletContext();
 }
 
 export default function MainLayout() {

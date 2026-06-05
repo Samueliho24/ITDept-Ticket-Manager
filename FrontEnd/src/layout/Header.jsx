@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useCallback, startTransition } from 'react
 import { Breadcrumb, Badge, Input, Popover, List, Empty, Spin } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, Bell, Search } from 'lucide-react';
-import { getNotifications, markAsRead } from '../services/notificationService';
+import { getNotifications, markAsRead, getStaleAlerts } from '../services/notificationService';
 import { useModals } from '../context/ModalContext';
+import { useAuth } from '../context/AuthContext';
 
 const breadcrumbMap = {
   '/dashboard': { section: 'PRINCIPAL', item: 'Inicio' },
@@ -16,9 +17,17 @@ const breadcrumbMap = {
   '/help': { section: 'SOPORTE', item: 'Ayuda' },
 };
 
+const workspaceMatch = (path) => {
+  if (path.startsWith('/workspace/')) {
+    return { section: 'PRINCIPAL', item: 'Atención de Ticket' };
+  }
+  return null;
+};
+
 export default function Header({ onMenuClick, isMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [notifications, setNotifications] = useState([]);
@@ -27,19 +36,35 @@ export default function Header({ onMenuClick, isMobile }) {
   const { openDetail } = useModals();
   const pollRef = useRef(null);
 
+  const isTechOrAdmin = user?.role === 'technician' || user?.role === 'admin';
+
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
   const fetchNotifications = useCallback(async () => {
     setNotifLoading(true);
     try {
       const res = await getNotifications({ limit: 20 });
-      setNotifications(res.data.items || []);
+      let items = res.data.items || [];
+      if (isTechOrAdmin) {
+        try {
+          const staleRes = await getStaleAlerts();
+          const staleAlerts = (staleRes.data || []).map((a) => ({
+            id: `stale-${a.ticket_id}`,
+            message: a.message,
+            ticket_id: a.ticket_id,
+            read_at: null,
+            created_at: a.opened_at,
+          }));
+          items = [...staleAlerts, ...items];
+        } catch {}
+      }
+      setNotifications(items);
     } catch {
       setNotifications([]);
     } finally {
       setNotifLoading(false);
     }
-  }, []);
+  }, [isTechOrAdmin]);
 
   useEffect(() => {
     startTransition(() => { fetchNotifications(); });
@@ -50,14 +75,19 @@ export default function Header({ onMenuClick, isMobile }) {
   }, [fetchNotifications]);
 
   const handleMarkRead = async (notif) => {
+    if (notif.id.startsWith('stale-')) {
+      openDetail({ id: notif.ticket_id });
+      setNotifOpen(false);
+      return;
+    }
     try {
       await markAsRead(notif.id);
       setNotifications((prev) =>
         prev.map((n) => (n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n))
       );
-      openDetail(notif.ticket);
+      openDetail({ id: notif.ticket_id });
     } catch {
-      openDetail(notif.ticket);
+      openDetail({ id: notif.ticket_id });
     }
     setNotifOpen(false);
   };
@@ -67,7 +97,7 @@ export default function Header({ onMenuClick, isMobile }) {
     navigate('/history', { state: { search: value.trim() } });
   };
 
-  const current = breadcrumbMap[location.pathname] || null;
+  const current = breadcrumbMap[location.pathname] || workspaceMatch(location.pathname) || null;
 
   const notifContent = (
     <div className="notif-dropdown">

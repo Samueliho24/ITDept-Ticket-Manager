@@ -10,6 +10,7 @@ class EquipmentCreate(BaseModel):
     model: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
     department_id: Optional[str] = None
+    assigned_person: Optional[str] = None
 
 
 class EquipmentUpdate(BaseModel):
@@ -18,6 +19,7 @@ class EquipmentUpdate(BaseModel):
     brand: Optional[str] = None
     model: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
+    assigned_person: Optional[str] = None
 
 
 class EquipmentLocationUpdate(BaseModel):
@@ -37,6 +39,8 @@ class EquipmentResponse(BaseModel):
     technical_specifications: Optional[Dict[str, Any]] = None
     status: str
     department_id: Optional[str] = None
+    department_name: Optional[str] = None
+    assigned_person: Optional[str] = None
     entry_date: Optional[datetime] = None
     out_date: Optional[datetime] = None
 

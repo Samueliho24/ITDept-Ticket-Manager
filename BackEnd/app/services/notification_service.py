@@ -1,9 +1,20 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from BackEnd.app.models.notification_reads import NotificationRead
 from BackEnd.app.models.tickets import Tickets
 from BackEnd.app.models.users import Users
+
+
+class StaleAlert(BaseModel):
+    ticket_id: str
+    ticket_title: str
+    status: str
+    opened_at: Optional[datetime] = None
+    days_stale: int
+    message: str
 
 
 def list_notifications(
@@ -55,3 +66,28 @@ def create_notification(
     db.add(notif)
     db.flush()
     return notif
+
+
+def get_stale_alerts(db: Session, current_user: Users) -> list[StaleAlert]:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=5)
+    tickets = (
+        db.query(Tickets)
+        .filter(
+            Tickets.assigned_technician_id == current_user.id,
+            Tickets.status.notin_(["Resuelto", "Cerrado", "Anulado"]),
+            Tickets.opened_at < cutoff,
+        )
+        .all()
+    )
+    alerts = []
+    for t in tickets:
+        days = (datetime.now(timezone.utc) - t.opened_at).days
+        alerts.append(StaleAlert(
+            ticket_id=t.id,
+            ticket_title=t.title,
+            status=t.status,
+            opened_at=t.opened_at,
+            days_stale=days,
+            message=f"⚠ El Ticket #{t.id[:8]} lleva {days} días asignado sin cambios de estado.",
+        ))
+    return alerts
