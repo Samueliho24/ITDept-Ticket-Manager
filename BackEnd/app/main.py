@@ -9,6 +9,7 @@ from .routers.equipments import router as equipments_router
 from .routers.tickets import router as tickets_router
 from .routers.department import router as departments_router
 from .routers.audit import router as audit_router
+from .routers.notifications import router as notifications_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -41,6 +42,7 @@ app.include_router(equipments_router, prefix="/api/v1/equipments", tags=["Equipm
 app.include_router(tickets_router, prefix="/api/v1/tickets", tags=["Tickets"])
 app.include_router(departments_router, prefix="/api/v1/departments", tags=["Departments"])
 app.include_router(audit_router, prefix="/api/v1/admin", tags=["Audit Logs"])
+app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Notifications"])
 
 
 @app.get("/")

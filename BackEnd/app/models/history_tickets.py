@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from BackEnd.app.core.db import Base
 import datetime, uuid
@@ -12,6 +12,7 @@ class TicketHistory(Base):
     new_status = Column(String(50))
     technical_comment = Column(String(500))
     technical_action = Column(String(100))
+    reason = Column(String(255), nullable=True)
     change_date = Column(DateTime, default=datetime.datetime.utcnow)
 
     ticket = relationship("Tickets", foreign_keys=[ticket_id], back_populates="history")

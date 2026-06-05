@@ -12,3 +12,4 @@ class Departments(Base):
 
     user = relationship("Users", back_populates="department")
     equipment = relationship("Equipment", back_populates="department")
+    tickets = relationship("Tickets", back_populates="department")

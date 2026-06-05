@@ -10,6 +10,7 @@ class TicketHistoryResponse(BaseModel):
     new_status: Optional[str] = None
     technical_action: Optional[str] = None
     technical_comment: Optional[str] = None
+    reason: Optional[str] = None
     change_date: Optional[datetime] = None
 
     class Config:

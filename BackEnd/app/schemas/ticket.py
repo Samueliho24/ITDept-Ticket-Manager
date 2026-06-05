@@ -9,6 +9,7 @@ class TicketCreate(BaseModel):
     priority: str = "Media"
     category: Optional[str] = None
     equipment_id: Optional[str] = None
+    department_id: Optional[str] = None
 
 
 class TicketAssign(BaseModel):
@@ -25,6 +26,10 @@ class TicketResolve(BaseModel):
     spare_parts_used: Optional[str] = None
 
 
+class TicketCancel(BaseModel):
+    reason: str
+
+
 class TicketResponse(BaseModel):
     id: str
     title: str
@@ -35,6 +40,8 @@ class TicketResponse(BaseModel):
     requester_id: str
     assigned_technician_id: Optional[str] = None
     equipment_id: Optional[str] = None
+    department_id: Optional[str] = None
+    rated: bool = False
     opened_at: Optional[datetime] = None
     closed_at: Optional[datetime] = None
 

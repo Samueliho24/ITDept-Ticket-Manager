@@ -26,7 +26,7 @@ def list_departments_endpoint(
     limit: int = Query(10, ge=1, le=100, description="Registros por página"),
     offset: int = Query(0, ge=0, description="Desplazamiento"),
     db: Session = Depends(getDb),
-    current_user: Users = Depends(RoleChecker(["admin"])),
+    current_user: Users = Depends(RoleChecker(["admin", "technician", "resquestor"])),
 ):
     items, total = list_departments(db, limit, offset)
     return DepartmentPaginated(total=total, limit=limit, offset=offset, items=items)
