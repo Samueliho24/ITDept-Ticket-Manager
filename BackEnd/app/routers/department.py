@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import RoleChecker
 from BackEnd.app.models.users import Users
-from BackEnd.app.schemas.department import DepartmentCreate, DepartmentResponse
+from BackEnd.app.schemas.department import DepartmentCreate, DepartmentUpdate, DepartmentResponse
 from BackEnd.app.schemas.pagination import DepartmentPaginated
 from BackEnd.app.services.department_service import (
-    create_department, delete_department, list_departments, get_department,
+    create_department, update_department, delete_department, list_departments, get_department,
 )
 
 router = APIRouter()
@@ -18,7 +18,17 @@ def create_department_endpoint(
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin"])),
 ):
-    return create_department(db, data.name, current_user)
+    return create_department(db, data.name, data.code, current_user)
+
+
+@router.put("/{department_id}", response_model=DepartmentResponse)
+def update_department_endpoint(
+    department_id: str,
+    data: DepartmentUpdate,
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(RoleChecker(["admin"])),
+):
+    return update_department(db, department_id, data, current_user)
 
 
 @router.get("/", response_model=DepartmentPaginated)

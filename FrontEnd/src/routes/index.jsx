@@ -8,6 +8,9 @@ import TechnicianDashboard from '../pages/technician/Dashboard';
 import TechnicianHistory from '../pages/technician/History';
 import Workspace from '../pages/technician/Workspace';
 import EquipmentInventory from '../pages/technician/EquipmentInventory';
+import UserManagement from '../pages/admin/UserManagement';
+import AuditLog from '../pages/admin/AuditLog';
+import Settings from '../pages/admin/Settings';
 import { useAuth } from '../context/AuthContext';
 
 function RoleDashboard() {
@@ -35,9 +38,9 @@ export default function AppRoutes() {
           <Route path="/equipment" element={<ProtectedRoute allowedRoles={['admin', 'technician']}><EquipmentInventory /></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute allowedRoles={['admin', 'technician', 'requestor']}><RoleHistory /></ProtectedRoute>} />
           <Route path="/assign" element={<ProtectedRoute allowedRoles={['admin']}><div>Asignación</div></ProtectedRoute>} />
-          <Route path="/users" element={<ProtectedRoute allowedRoles={['admin']}><div>Usuarios</div></ProtectedRoute>} />
-          <Route path="/audit" element={<ProtectedRoute allowedRoles={['admin']}><div>Auditoría</div></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']}><div>Configuración</div></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
+          <Route path="/audit" element={<ProtectedRoute allowedRoles={['admin']}><AuditLog /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']}><Settings /></ProtectedRoute>} />
           <Route path="/help" element={<ProtectedRoute allowedRoles={['admin', 'technician', 'requestor']}><div>Ayuda</div></ProtectedRoute>} />
         </Route>
       </Route>
