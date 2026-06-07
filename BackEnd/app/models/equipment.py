@@ -12,6 +12,7 @@ class Equipment(Base):
     brand = Column(String(100))
     model = Column(String(100))
     technical_specifications = Column(JSON)
+    sequence = Column(Integer, default=0)
     status = Column(String(50), default="Operativo")
     department_id = Column(String(36), ForeignKey("departments.id"))
     assigned_person = Column(String(200), nullable=True)

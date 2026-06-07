@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class EquipmentCreate(BaseModel):
-    inventory_code: str
+    inventory_code: Optional[str] = None
     equipment_type: str
     brand: Optional[str] = None
     model: Optional[str] = None

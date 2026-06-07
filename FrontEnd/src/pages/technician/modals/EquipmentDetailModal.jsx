@@ -1,5 +1,6 @@
 import { useState, useEffect, startTransition } from 'react';
-import { Modal, Descriptions, Tag, Table, Spin } from 'antd';
+import { Modal, Descriptions, Tag, Table, Spin, Button, Space } from 'antd';
+import { EditOutlined, SwapOutlined, StopOutlined } from '@ant-design/icons';
 import { listTickets } from '../../../services/ticketService';
 
 const SPEC_LABELS = {
@@ -25,9 +26,10 @@ const SPEC_LABELS = {
   battery_status: 'Estado Batería',
 };
 
-export default function EquipmentDetailModal({ equipment, open, onClose }) {
+export default function EquipmentDetailModal({ equipment, open, onClose, onEdit, onTransfer, onDecommission }) {
   const [maintenanceHistory, setMaintenanceHistory] = useState([]);
   const [histLoading, setHistLoading] = useState(false);
+  const isAdmin = !!(onEdit || onTransfer || onDecommission);
 
   useEffect(() => {
     if (open && equipment?.id) {
@@ -51,12 +53,39 @@ export default function EquipmentDetailModal({ equipment, open, onClose }) {
       render: (v) => v || '—' },
   ];
 
+  const statusColor = {
+    Operativo: 'green',
+    'En Mantenimiento': 'gold',
+    'En Observación': 'gold',
+    Dañado: 'red',
+    Desincorporado: 'red',
+  };
+
   return (
     <Modal
       title={`Ficha Técnica — ${equipment?.inventory_code || ''}`}
       open={open}
       onCancel={onClose}
-      footer={null}
+      footer={
+        isAdmin
+          ? (
+            <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <span style={{ color: '#64748B', fontSize: 13 }}>Acciones de administración</span>
+              <Space>
+                <Button icon={<EditOutlined />} onClick={() => { onClose(); onEdit?.(equipment); }}>
+                  Editar
+                </Button>
+                <Button icon={<SwapOutlined />} onClick={() => { onClose(); onTransfer?.(equipment); }}>
+                  Trasladar
+                </Button>
+                <Button icon={<StopOutlined />} onClick={() => { onClose(); onDecommission?.(equipment); }}>
+                  Cambiar Estado
+                </Button>
+              </Space>
+            </Space>
+          )
+          : null
+      }
       width={700}
       destroyOnClose
     >
@@ -74,7 +103,7 @@ export default function EquipmentDetailModal({ equipment, open, onClose }) {
                 {equipment.assigned_person || '—'}
               </Descriptions.Item>
               <Descriptions.Item label="Estado" span={2}>
-                <Tag color={equipment.status === 'Operativo' ? 'green' : equipment.status === 'En Observación' ? 'gold' : 'red'}>
+                <Tag color={statusColor[equipment.status] || 'default'}>
                   {equipment.status}
                 </Tag>
               </Descriptions.Item>

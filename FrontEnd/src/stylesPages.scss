@@ -1451,6 +1451,74 @@ a {
       }
     }
   }
+
+  .equip-action-trigger {
+    color: $color-text-light;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-accent;
+    }
+  }
+
+  .equip-status-tag {
+    font-weight: 500;
+    font-size: 13px;
+  }
+}
+
+// ============================================
+// EQUIPMENT ADMIN — MODALS (specs, decommission)
+// ============================================
+.equipment-modal-specs {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid $color-header-border;
+
+  .specs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      color: $color-text;
+    }
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+
+    .ant-form-item {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.decommission-notice {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #FFF2F0;
+  border: 1px solid #FFCCC7;
+  border-radius: $border-radius-sm;
+  color: $color-danger;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auto-code-notice {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #F0F5FF;
+  border: 1px solid #D6E4FF;
+  border-radius: $border-radius-sm;
+  color: $color-primary;
+  font-size: 13px;
 }
 
 // ============================================

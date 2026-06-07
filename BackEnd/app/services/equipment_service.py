@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.departments import Departments
 from BackEnd.app.models.audit_log import AuditLog
@@ -14,6 +14,27 @@ from BackEnd.app.schemas.equipment import (
 )
 
 ALLOWED_EQUIPMENT_STATUSES = {"Operativo", "En Mantenimiento", "Dañado", "Desincorporado"}
+
+EQUIPMENT_PREFIXES = {
+    "PC": "COM",
+    "Laptop": "LAP",
+    "Impresora": "IMP",
+    "Switch": "SWI",
+    "Router": "ROU",
+    "UPS": "UPS",
+    "Server": "SER",
+    "Otro": "OTR",
+}
+
+
+def _generate_inventory_code(db: Session, equipment_type: str) -> tuple[str, int]:
+    prefix = EQUIPMENT_PREFIXES.get(equipment_type, "OTR")
+    max_seq = db.query(func.max(Equipment.sequence)).filter(
+        Equipment.equipment_type == equipment_type
+    ).scalar()
+    sequence = (max_seq or 0) + 1
+    code = f"{prefix}-{sequence:06d}"
+    return code, sequence
 
 
 def _register_audit(db: Session, user: Users, action: str, equipment: Equipment, extra: dict = None):
@@ -35,15 +56,11 @@ def _register_audit(db: Session, user: Users, action: str, equipment: Equipment,
 
 
 def create_equipment(db: Session, data: EquipmentCreate, current_user: Users) -> Equipment:
-    existing = db.query(Equipment).filter(Equipment.inventory_code == data.inventory_code).first()
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Ya existe un equipo con ese código de inventario.",
-        )
+    inventory_code, sequence = _generate_inventory_code(db, data.equipment_type)
     equipment = Equipment(
         id=str(uuid.uuid4()),
-        inventory_code=data.inventory_code,
+        inventory_code=inventory_code,
+        sequence=sequence,
         equipment_type=data.equipment_type,
         brand=data.brand,
         model=data.model,
