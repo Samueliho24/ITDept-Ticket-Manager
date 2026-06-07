@@ -116,6 +116,7 @@ export default function Settings() {
 
   return (
     <div className="admin-settings-page">
+      <h2 className="page-title">CONFIGURACIÓN</h2>
       {/* DEPARTMENTS SECTION */}
       <section className="settings-section">
         <div className="settings-section-header">

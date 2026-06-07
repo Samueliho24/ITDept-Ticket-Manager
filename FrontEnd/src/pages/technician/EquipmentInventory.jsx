@@ -71,13 +71,13 @@ export default function EquipmentInventory() {
 
   return (
     <div className="equipment-inventory">
-      <h2>Inventario Tecnológico</h2>
+      <h2 className="page-title">INVENTARIO TECNOLÓGICO</h2>
       <div className="inventory-filter-bar">
         <Input
           placeholder="Buscar por código, marca o modelo..."
           prefix={<Search size={16} />}
           allowClear
-          style={{ width: 280 }}
+          style={{ flex: 1, minWidth: 200 }}
           value={filters.search}
           onChange={(e) => { setFilters((p) => ({ ...p, search: e.target.value })); setPage(1); }}
         />

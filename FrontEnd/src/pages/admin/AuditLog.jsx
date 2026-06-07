@@ -161,23 +161,24 @@ export default function AuditLog() {
 
   return (
     <div className="admin-audit-page">
+      <h2 className="page-title">REGISTRO DE AUDITORÍA</h2>
       <div className="audit-filters-bar">
         <RangePicker
           onChange={handleRangeChange}
-          style={{ minWidth: 240 }}
+          style={{ flex: 1, minWidth: 200 }}
         />
         <Input
           placeholder="Buscar por usuario..."
           prefix={<SearchOutlined />}
           value={usernameFilter}
           onChange={(e) => { setUsernameFilter(e.target.value); setPage(1); }}
-          style={{ width: 220 }}
+          style={{ flex: 1, maxWidth: 300 }}
           allowClear
         />
         <Select
           allowClear
           placeholder="Tipo de movimiento"
-          style={{ width: 200 }}
+          style={{ flex: 1, maxWidth: 220, minWidth: 160 }}
           value={actionFilter}
           onChange={(val) => { setActionFilter(val); setPage(1); }}
           options={[

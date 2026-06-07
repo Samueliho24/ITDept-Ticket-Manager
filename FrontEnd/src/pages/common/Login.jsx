@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Alert } from 'antd';
+import { Form, Input, Button, Alert, Modal } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 
@@ -8,6 +8,7 @@ export default function Login() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -87,13 +88,34 @@ export default function Login() {
               Ingresar
             </Button>
           </Form.Item>
-        </Form>
 
-        <div className="footer">
-          <h4>Departamento de Tecnología, Información y Comunicación</h4>
-          <p>Facultad de Odontología · Universidad del Zulia</p>
-        </div>
+          <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
+            <Button type="link" onClick={() => setForgotModalOpen(true)}>
+              ¿Olvidó su usuario o contraseña?
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
+
+      <div className="login-footer">
+        <h4>Departamento de Tecnología, Información y Comunicación</h4>
+        <p>Facultad de Odontología · Universidad del Zulia</p>
+      </div>
+
+      <Modal
+        title="Recuperación de Credenciales"
+        open={forgotModalOpen}
+        onCancel={() => setForgotModalOpen(false)}
+        footer={<Button type="primary" onClick={() => setForgotModalOpen(false)}>Cerrar</Button>}
+      >
+        <p>
+          Para restablecer su usuario o contraseña, comuníquese al Departamento de Tecnología,
+          Información y Comunicación de la Facultad de Odontología a través del correo electrónico:
+        </p>
+        <p style={{ fontWeight: 600, textAlign: 'center', fontSize: 16, marginTop: 12 }}>
+          tic.odontologia@luz.edu.ve
+        </p>
+      </Modal>
     </div>
   );
 }

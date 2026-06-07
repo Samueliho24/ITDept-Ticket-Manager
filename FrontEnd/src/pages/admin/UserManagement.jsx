@@ -172,6 +172,7 @@ export default function UserManagement() {
 
   return (
     <div className="admin-users-page">
+      <h2 className="page-title">GESTIÓN DE USUARIOS</h2>
       <div className="admin-users-header">
         <Input
           placeholder="Escribir por nombre o departamento"
@@ -179,6 +180,7 @@ export default function UserManagement() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="admin-users-search"
+          style={{ flex: 1 }}
           allowClear
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>

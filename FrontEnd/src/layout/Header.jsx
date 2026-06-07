@@ -155,20 +155,20 @@ export default function Header({ onMenuClick, isMobile }) {
               ]}
             />
           )}
-        </div>
-        <div className="actions">
-          {!isMobile ? (
+          {!isMobile && (
             <Input.Search
               placeholder="Buscar..."
               className="header-search"
               variant="borderless"
-              style={{ color: 'rgba(255,255,255,0.6)' }}
               size={16}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               onSearch={handleSearch}
             />
-          ) : (
+          )}
+        </div>
+        <div className="actions">
+          {isMobile && (
             <button
               type="button"
               className="mobile-search-btn"
@@ -196,10 +196,8 @@ export default function Header({ onMenuClick, isMobile }) {
         <div className="mobile-search-bar">
           <Input
             placeholder="Buscar..."
-            variant="borderless"
-            style={{ color: 'rgba(255,255,255,0.6)' }}
-            prefix={<Search size={16} />}
             className="mobile-search-input"
+            prefix={<Search size={16} />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             onPressEnter={() => handleSearch(searchText)}

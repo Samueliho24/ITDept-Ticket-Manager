@@ -77,17 +77,18 @@ export default function TechnicianHistory() {
 
   return (
     <div className="requestor-history">
-      <h2>Historial de Tickets Asignados</h2>
+      <h2 className="page-title">HISTORIAL DE TICKETS ASIGNADOS</h2>
       <div className="history-filter-bar">
         <Select
           allowClear
           placeholder="Filtrar por estado"
-          style={{ width: 180 }}
+          style={{ flex: 1, maxWidth: 300, minWidth: 180 }}
           value={statusFilter}
           onChange={(val) => { setStatusFilter(val); setPage(1); }}
           options={ticketStatusList}
         />
         <RangePicker
+          style={{ flex: 1, minWidth: 200 }}
           onChange={(dates) => { setDateRange(dates); setPage(1); }}
         />
       </div>
