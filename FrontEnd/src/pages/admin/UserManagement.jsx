@@ -275,7 +275,7 @@ export default function UserManagement() {
                 options={[
                   { label: 'Administrador', value: 'admin' },
                   { label: 'Técnico', value: 'technician' },
-                  { label: 'Solicitante', value: 'resquestor' },
+                  { label: 'Solicitante', value: 'requestor' },
                 ]}
               />
             </Form.Item>

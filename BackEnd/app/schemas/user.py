@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
     lastname: str
     username: str
     password: str
-    role: str = "resquestor"
+    role: str = "requestor"
     department_id: Optional[str] = None
 
 

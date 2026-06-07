@@ -74,6 +74,6 @@ def list_equipment_endpoint(
 def get_equipment_endpoint(
     equipment_id: str,
     db: Session = Depends(getDb),
-    current_user: Users = Depends(RoleChecker(["admin", "technician", "resquestor"])),
+    current_user: Users = Depends(RoleChecker(["admin", "technician", "requestor"])),
 ):
     return get_equipment(db, equipment_id)

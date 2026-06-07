@@ -25,7 +25,7 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 - Passwords hashed with **bcrypt** via `passlib` (`hash_password` / `verify_password` in `core/security.py`).
 - Every write endpoint (POST/PATCH/DELETE) must log to `ChangeHistory`.
 - Reusable auth dependencies in `BackEnd/app/core/security.py`: `get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles([...])`, `RoleChecker`.
-- RBAC cascade: `admin` inherits `technician` which inherits `resquestor`. Use `RoleChecker(["admin"])`, `RoleChecker(["admin","technician"])`, or `RoleChecker(["admin","technician","resquestor"])`.
+- RBAC cascade: `admin` inherits `technician` which inherits `requestor`. Use `RoleChecker(["admin"])`, `RoleChecker(["admin","technician"])`, or `RoleChecker(["admin","technician","requestor"])`.
 - Ticket status flow: `Abierto → Asignado → En Proceso → Pendiente → Resuelto → Cerrado`. Created as "Abierto", assigned sets "Asignado", status PATCH allows "En Proceso"/"Pendiente", resolve POST sets "Resuelto".
 
 ## Commands

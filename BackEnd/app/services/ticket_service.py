@@ -147,7 +147,7 @@ def list_tickets(
     equipment_id: Optional[str] = None,
 ) -> tuple[list[Tickets], int]:
     query = db.query(Tickets)
-    if current_user.role == "resquestor":
+    if current_user.role == "requestor":
         query = query.filter(Tickets.requester_id == current_user.id)
     elif current_user.role == "technician":
         query = query.filter(
@@ -184,7 +184,7 @@ def get_ticket(db: Session, ticket_id: str, current_user: Users) -> Tickets:
     ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    if current_user.role == "resquestor" and ticket.requester_id != current_user.id:
+    if current_user.role == "requestor" and ticket.requester_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tiene permiso para ver este ticket.",
@@ -197,7 +197,7 @@ def get_ticket_history(db: Session, ticket_id: str, current_user: Users) -> list
     ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    if current_user.role == "resquestor" and ticket.requester_id != current_user.id:
+    if current_user.role == "requestor" and ticket.requester_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tiene permiso para ver este ticket.",
@@ -320,7 +320,7 @@ def cancel_ticket(db: Session, ticket_id: str, data: TicketCancel, current_user:
     ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    if current_user.role == "resquestor" and ticket.requester_id != current_user.id:
+    if current_user.role == "requestor" and ticket.requester_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No puedes anular un ticket que no te pertenece.",
@@ -348,7 +348,7 @@ def rate_ticket(db: Session, ticket_id: str, data: RateRequest, current_user: Us
     ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    if current_user.role == "resquestor" and ticket.requester_id != current_user.id:
+    if current_user.role == "requestor" and ticket.requester_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No puedes calificar un ticket que no te pertenece.",
@@ -388,7 +388,7 @@ def get_ticket_rating(db: Session, ticket_id: str, current_user: Users) -> Optio
     ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    if current_user.role == "resquestor" and ticket.requester_id != current_user.id:
+    if current_user.role == "requestor" and ticket.requester_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permiso para ver este ticket.",
