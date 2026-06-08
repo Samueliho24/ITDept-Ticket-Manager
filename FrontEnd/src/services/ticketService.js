@@ -19,3 +19,5 @@ export const cancelTicket = (id, data) => api.patch(`/tickets/${id}/cancel`, dat
 export const rateTicket = (id, data) => api.post(`/tickets/${id}/rate`, data);
 
 export const getTicketRating = (id) => api.get(`/tickets/${id}/rating`);
+
+export const updateTicketCategory = (id, data) => api.patch(`/tickets/${id}/category`, data);

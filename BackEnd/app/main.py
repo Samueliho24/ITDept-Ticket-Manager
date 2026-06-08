@@ -11,6 +11,7 @@ from .routers.department import router as departments_router
 from .routers.audit import router as audit_router
 from .routers.notifications import router as notifications_router
 from .routers.metrics import router as metrics_router
+from .routers.categories import router as categories_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,6 +46,7 @@ app.include_router(departments_router, prefix="/api/v1/departments", tags=["Depa
 app.include_router(audit_router, prefix="/api/v1/admin", tags=["Audit Logs"])
 app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Notifications"])
 app.include_router(metrics_router, prefix="/api/v1/admin", tags=["Metrics"])
+app.include_router(categories_router, prefix="/api/v1/categories", tags=["Categories"])
 
 
 @app.get("/")

@@ -44,6 +44,10 @@ function LayoutInner() {
         <div className="page-content">
           <Outlet context={{ refreshKey }} />
         </div>
+        <footer className="app-footer">
+          <h4>Departamento de Tecnología, Información y Comunicación</h4>
+          <p>Facultad de Odontología · Universidad del Zulia</p>
+        </footer>
       </div>
       <ReportTicketModal onSuccess={handleSuccess} />
       <TicketDetailModal />

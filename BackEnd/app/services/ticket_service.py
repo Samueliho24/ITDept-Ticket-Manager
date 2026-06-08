@@ -12,7 +12,7 @@ from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.users import Users
 from BackEnd.app.models.departments import Departments
 from BackEnd.app.schemas.ticket import (
-    TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve, TicketCancel,
+    TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve, TicketCancel, TicketCategoryUpdate,
 )
 from BackEnd.app.schemas.rating import RateRequest, RatingResponse
 from BackEnd.app.services.notification_service import create_notification
@@ -310,6 +310,34 @@ def resolve_ticket(db: Session, ticket_id: str, data: TicketResolve, current_use
         db, ticket.requester_id, ticket.id,
         f"Tu ticket #{ticket.id[:8]} ha sido resuelto. ¡Califica el servicio!",
     )
+    _enrich_tickets_with_names(db, [ticket])
+    db.commit()
+    db.refresh(ticket)
+    return ticket
+
+
+def update_ticket_category(db: Session, ticket_id: str, data: TicketCategoryUpdate, current_user: Users) -> Tickets:
+    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
+    old_category = ticket.category
+    ticket.category = data.category
+    username = f"{current_user.name} {current_user.lastname}" if current_user.name else current_user.username
+    action_detail = f"Categoría actualizada por {username}"
+    if old_category:
+        action_detail += f" de '{old_category}' a '{data.category}'" if data.category else " (sin categoría)"
+    elif data.category:
+        action_detail += f" a '{data.category}'"
+    _register_ticket_history(db, ticket, ticket.status, ticket.status, action=action_detail)
+    _register_audit(db, current_user, "update_ticket_category", ticket, {
+        "old_category": old_category,
+        "new_category": data.category,
+    })
+    if ticket.requester_id != current_user.id:
+        create_notification(
+            db, ticket.requester_id, ticket.id,
+            f"La categoría de tu ticket #{ticket.id[:8]} ha sido actualizada.",
+        )
     _enrich_tickets_with_names(db, [ticket])
     db.commit()
     db.refresh(ticket)

@@ -28,6 +28,8 @@ export const equipmentTypeList = [
   { label: 'Impresora', value: 'Impresora' },
   { label: 'Switch', value: 'Switch' },
   { label: 'Router', value: 'Router' },
+  { label: 'UPS', value: 'UPS' },
+  { label: 'Server', value: 'Server' },
   { label: 'Otro', value: 'Otro' },
 ];
 

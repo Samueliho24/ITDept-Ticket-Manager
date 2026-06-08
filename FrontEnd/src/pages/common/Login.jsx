@@ -113,7 +113,7 @@ export default function Login() {
           Información y Comunicación de la Facultad de Odontología a través del correo electrónico:
         </p>
         <p style={{ fontWeight: 600, textAlign: 'center', fontSize: 16, marginTop: 12 }}>
-          tic.odontologia@luz.edu.ve
+          <a href="mailto:dptotic.facoluz@gmail.com" target="_blank" rel="noopener noreferrer">dptotic.facoluz@gmail.com</a>
         </p>
       </Modal>
     </div>

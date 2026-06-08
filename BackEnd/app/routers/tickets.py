@@ -5,7 +5,7 @@ from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import get_current_active_user, RoleChecker
 from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.ticket import (
-    TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve,
+    TicketCreate, TicketAssign, TicketStatusUpdate, TicketResolve, TicketCategoryUpdate,
     TicketCancel, TicketResponse,
 )
 from BackEnd.app.schemas.history import TicketHistoryResponse
@@ -14,7 +14,7 @@ from BackEnd.app.schemas.pagination import TicketPaginated
 from BackEnd.app.services.ticket_service import (
     create_ticket, list_tickets, get_ticket, get_ticket_history,
     assign_ticket, update_ticket_status, resolve_ticket,
-    cancel_ticket, rate_ticket, get_ticket_rating,
+    cancel_ticket, rate_ticket, get_ticket_rating, update_ticket_category,
 )
 
 router = APIRouter()
@@ -97,6 +97,16 @@ def resolve_ticket_endpoint(
     current_user: Users = Depends(RoleChecker(["admin", "technician"])),
 ):
     return resolve_ticket(db, ticket_id, data, current_user)
+
+
+@router.patch("/{ticket_id}/category", response_model=TicketResponse)
+def update_ticket_category_endpoint(
+    ticket_id: str,
+    data: TicketCategoryUpdate,
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(RoleChecker(["admin", "technician"])),
+):
+    return update_ticket_category(db, ticket_id, data, current_user)
 
 
 @router.patch("/{ticket_id}/cancel", response_model=TicketResponse)

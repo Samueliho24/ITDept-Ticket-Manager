@@ -561,6 +561,30 @@ body {
 }
 
 // ============================================
+// APP FOOTER
+// ============================================
+.app-footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 10px 24px;
+  font-size: 12px;
+  color: $color-text-light;
+  border-top: 1px solid $color-header-border;
+  background-color: $color-card-bg;
+
+  h4 {
+    font-weight: 600;
+    margin: 0 0 2px;
+    font-size: inherit;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.7;
+  }
+}
+
+// ============================================
 // KPI CARDS GRID
 // ============================================
 .metricas-grid {

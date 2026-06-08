@@ -26,6 +26,10 @@ class TicketResolve(BaseModel):
     spare_parts_used: Optional[str] = None
 
 
+class TicketCategoryUpdate(BaseModel):
+    category: Optional[str] = None
+
+
 class TicketCancel(BaseModel):
     reason: str
 

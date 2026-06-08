@@ -41,10 +41,12 @@ CREATE TABLE users (
 CREATE TABLE equipment (
     id                       VARCHAR(36) PRIMARY KEY,
     inventory_code           VARCHAR(100) NOT NULL UNIQUE,
-    equipment_type           VARCHAR(50) NOT NULL COMMENT 'PC | Laptop | Impresora | Switch | Router | Otro',
+    equipment_type           VARCHAR(50) NOT NULL COMMENT 'PC | Laptop | Impresora | Switch | Router | UPS | Server | Otro',
     brand                    VARCHAR(100) NULL,
     model                    VARCHAR(100) NULL,
+    serial                   VARCHAR(200) NULL COMMENT 'N�mero de serie del fabricante',
     technical_specifications JSON NULL COMMENT 'Especificaciones t�cnicas en JSON',
+    sequence                 INT DEFAULT 0 COMMENT 'Secuencia para c�digo de inventario',
     status                   VARCHAR(50) DEFAULT 'Operativo' COMMENT 'Operativo | En Mantenimiento | Da�ado | Desincorporado',
     department_id            VARCHAR(36) NULL,
     assigned_person          VARCHAR(200) NULL COMMENT 'Persona asignada',
