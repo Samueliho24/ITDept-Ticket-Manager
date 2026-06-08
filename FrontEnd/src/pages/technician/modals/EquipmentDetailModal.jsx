@@ -98,6 +98,7 @@ export default function EquipmentDetailModal({ equipment, open, onClose, onEdit,
               </Descriptions.Item>
               <Descriptions.Item label="Marca">{equipment.brand || '—'}</Descriptions.Item>
               <Descriptions.Item label="Modelo">{equipment.model || '—'}</Descriptions.Item>
+              <Descriptions.Item label="N. Serie">{equipment.serial || '—'}</Descriptions.Item>
               <Descriptions.Item label="Ubicación">{equipment.department_name || '—'}</Descriptions.Item>
               <Descriptions.Item label="Persona Asignada">
                 {equipment.assigned_person || '—'}

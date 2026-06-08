@@ -8,6 +8,7 @@ class EquipmentCreate(BaseModel):
     equipment_type: str
     brand: Optional[str] = None
     model: Optional[str] = None
+    serial: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
     department_id: Optional[str] = None
     assigned_person: Optional[str] = None
@@ -18,6 +19,7 @@ class EquipmentUpdate(BaseModel):
     equipment_type: Optional[str] = None
     brand: Optional[str] = None
     model: Optional[str] = None
+    serial: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
     assigned_person: Optional[str] = None
 
@@ -36,6 +38,7 @@ class EquipmentResponse(BaseModel):
     equipment_type: str
     brand: Optional[str] = None
     model: Optional[str] = None
+    serial: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
     status: str
     department_id: Optional[str] = None

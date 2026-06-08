@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal, Form, Input, InputNumber, Select, Button, Space } from 'antd';
+const { TextArea } = Input;
 import { useAppContext } from '../../../context/AppContext';
 import { createEquipment } from '../../../services/equipmentService';
 import { equipmentTypeList } from '../../../constants/lists';
@@ -42,6 +43,7 @@ export default function AddAssetModal({ open, onClose, onSuccess, departments })
         equipment_type: values.equipment_type,
         brand: values.brand || null,
         model: values.model || null,
+        serial: values.serial || null,
         assigned_person: values.assigned_person || null,
         department_id: values.department_id || null,
         technical_specifications: Object.keys(technical_specifications).length > 0 ? technical_specifications : null,
@@ -74,6 +76,13 @@ export default function AddAssetModal({ open, onClose, onSuccess, departments })
       return (
         <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
           <InputNumber placeholder={field.label} style={{ width: '100%' }} />
+        </Form.Item>
+      );
+    }
+    if (field.type === 'textarea') {
+      return (
+        <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
+          <TextArea rows={3} placeholder={field.label} />
         </Form.Item>
       );
     }
@@ -112,6 +121,9 @@ export default function AddAssetModal({ open, onClose, onSuccess, departments })
           </Form.Item>
           <Form.Item name="model" label="Modelo" style={{ flex: 1 }}>
             <Input placeholder="Ej: Latitude 5540" />
+          </Form.Item>
+          <Form.Item name="serial" label="N. Serie (Opcional)" style={{ flex: 1 }}>
+            <Input placeholder="Ej: SN-12345678" />
           </Form.Item>
         </Space>
 

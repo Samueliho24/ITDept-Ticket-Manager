@@ -11,6 +11,7 @@ class Equipment(Base):
     equipment_type = Column(String(50), nullable=False)
     brand = Column(String(100))
     model = Column(String(100))
+    serial = Column(String(200), nullable=True)
     technical_specifications = Column(JSON)
     sequence = Column(Integer, default=0)
     status = Column(String(50), default="Operativo")

@@ -41,5 +41,7 @@ export const SPECS_FIELDS = {
     { key: 'raid_config', label: 'Configuración RAID', type: 'input' },
     { key: 'power_supplies', label: 'Fuentes de Poder', type: 'number' },
   ],
-  Otro: [],
+  Otro: [
+    { key: 'description', label: 'Descripción del equipo', type: 'textarea' },
+  ],
 };

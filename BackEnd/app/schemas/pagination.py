@@ -5,6 +5,14 @@ from BackEnd.app.schemas.user import UserResponse
 from BackEnd.app.schemas.department import DepartmentResponse
 from BackEnd.app.schemas.audit_log import AuditLogResponse
 from BackEnd.app.schemas.notification import NotificationResponse
+from BackEnd.app.schemas.category import CategoryResponse
+
+
+class CategoryPaginated(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: list[CategoryResponse]
 
 
 class EquipmentPaginated(BaseModel):

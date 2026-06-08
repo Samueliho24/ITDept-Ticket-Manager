@@ -2,16 +2,10 @@ import { useState, useEffect, useCallback, startTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Input, Select, Button, Spin, Tag, message, Divider } from 'antd';
 import { ArrowLeft, Search, Wrench } from 'lucide-react';
-import { getTicket, updateTicketStatus } from '../../services/ticketService';
+import { getTicket, updateTicketStatus, updateTicketCategory } from '../../services/ticketService';
 import { listEquipments } from '../../services/equipmentService';
+import { listCategories } from '../../services/categoryService';
 import ResolveTicketModal from './modals/ResolveTicketModal';
-
-const CATEGORY_OPTIONS = [
-  { label: 'Soporte de Software', value: 'Soporte de Software' },
-  { label: 'Falla de Hardware', value: 'Falla de Hardware' },
-  { label: 'Conectividad y Redes', value: 'Conectividad y Redes' },
-  { label: 'Mantenimiento Preventivo', value: 'Mantenimiento Preventivo' },
-];
 
 export default function Workspace() {
   const { ticketId } = useParams();
@@ -24,6 +18,8 @@ export default function Workspace() {
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [equipSearching, setEquipSearching] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [categoryUpdating, setCategoryUpdating] = useState(false);
 
   useEffect(() => {
     if (!ticketId) return;
@@ -43,6 +39,33 @@ export default function Workspace() {
       .catch(() => { message.error('Error al cargar ticket'); navigate('/dashboard'); })
       .finally(() => setLoading(false));
   }, [ticketId, navigate]);
+
+  useEffect(() => {
+    listCategories({ limit: 100 })
+      .then((res) => {
+        const items = res.data.items || [];
+        setCategoryOptions(
+          items
+            .filter((c) => c.is_active)
+            .map((c) => ({ label: c.name, value: c.name })),
+        );
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleCategoryChange = async (val) => {
+    setCategory(val);
+    setCategoryUpdating(true);
+    try {
+      await updateTicketCategory(ticketId, { category: val || null });
+      message.success('Categoría actualizada correctamente.');
+    } catch {
+      message.error('Error al actualizar la categoría.');
+      setCategory(ticket?.category || null);
+    } finally {
+      setCategoryUpdating(false);
+    }
+  };
 
   const handleEquipSearch = useCallback(async (value) => {
     setEquipmentSearch(value);
@@ -134,8 +157,10 @@ export default function Workspace() {
               placeholder="Seleccione una categoría"
               style={{ width: '100%' }}
               value={category}
-              onChange={(val) => setCategory(val)}
-              options={CATEGORY_OPTIONS}
+              onChange={handleCategoryChange}
+              options={categoryOptions}
+              loading={categoryUpdating}
+              allowClear
             />
           </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Form, Input, InputNumber, Select, Button, Space } from 'antd';
+const { TextArea } = Input;
 import { useAppContext } from '../../../context/AppContext';
 import { updateEquipment } from '../../../services/equipmentService';
 import { equipmentTypeList } from '../../../constants/lists';
@@ -21,6 +22,7 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
         equipment_type: equipment.equipment_type,
         brand: equipment.brand || undefined,
         model: equipment.model || undefined,
+        serial: equipment.serial || undefined,
         assigned_person: equipment.assigned_person || undefined,
         department_id: equipment.department_id || undefined,
       };
@@ -48,6 +50,7 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
         equipment_type: values.equipment_type,
         brand: values.brand || null,
         model: values.model || null,
+        serial: values.serial || null,
         assigned_person: values.assigned_person || null,
         technical_specifications: Object.keys(technical_specifications).length > 0 ? technical_specifications : null,
       });
@@ -78,6 +81,13 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
       return (
         <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
           <InputNumber placeholder={field.label} style={{ width: '100%' }} />
+        </Form.Item>
+      );
+    }
+    if (field.type === 'textarea') {
+      return (
+        <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
+          <TextArea rows={3} placeholder={field.label} />
         </Form.Item>
       );
     }
@@ -118,6 +128,9 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
           </Form.Item>
           <Form.Item name="model" label="Modelo" style={{ flex: 1 }}>
             <Input />
+          </Form.Item>
+          <Form.Item name="serial" label="N. Serie (Opcional)" style={{ flex: 1 }}>
+            <Input placeholder="Ej: SN-12345678" />
           </Form.Item>
         </Space>
 

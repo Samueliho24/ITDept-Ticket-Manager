@@ -6,3 +6,4 @@ from BackEnd.app.models.history_tickets import TicketHistory
 from BackEnd.app.models.ticket_ratings import TicketRating
 from BackEnd.app.models.notification_reads import NotificationRead
 from BackEnd.app.models.audit_log import AuditLog
+from BackEnd.app.models.categories import Categories

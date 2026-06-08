@@ -1,9 +1,10 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
+from sqlalchemy.exc import IntegrityError
 from BackEnd.app.models.equipment import Equipment
 from BackEnd.app.models.departments import Departments
 from BackEnd.app.models.audit_log import AuditLog
@@ -50,7 +51,7 @@ def _register_audit(db: Session, user: Users, action: str, equipment: Equipment,
         affected_table="equipment",
         record_id=equipment.id,
         details=details,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.utcnow(),
     )
     db.add(audit)
 
@@ -64,15 +65,23 @@ def create_equipment(db: Session, data: EquipmentCreate, current_user: Users) ->
         equipment_type=data.equipment_type,
         brand=data.brand,
         model=data.model,
+        serial=data.serial,
         technical_specifications=data.technical_specifications,
         department_id=data.department_id,
         status="Operativo",
-        entry_date=datetime.now(timezone.utc),
+        entry_date=datetime.utcnow(),
     )
     db.add(equipment)
     db.flush()
     _register_audit(db, current_user, "create_equipment", equipment)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error de integridad al crear el equipo. Verifique que el código de inventario no esté duplicado.",
+        )
     db.refresh(equipment)
     return equipment
 
@@ -91,7 +100,14 @@ def update_equipment(db: Session, equipment_id: str, data: EquipmentUpdate, curr
                 changed[field] = {"from": str(old_value), "to": str(value)}
     if changed:
         _register_audit(db, current_user, "update_equipment", equipment, {"changes": changed})
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error de integridad al actualizar el equipo. Verifique los datos únicos.",
+        )
     db.refresh(equipment)
     return equipment
 
@@ -109,7 +125,14 @@ def transfer_equipment(db: Session, equipment_id: str, data: EquipmentLocationUp
         "from_department": old_department_id,
         "to_department": data.department_id,
     })
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error de integridad al trasladar el equipo.",
+        )
     db.refresh(equipment)
     return equipment
 
@@ -129,7 +152,14 @@ def update_equipment_status(db: Session, equipment_id: str, data: EquipmentStatu
         "from_status": old_status,
         "to_status": data.status,
     })
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error de integridad al cambiar el estado del equipo.",
+        )
     db.refresh(equipment)
     return equipment
 
