@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
-import { Tag, Button, Tooltip, Spin, Empty, Badge } from 'antd';
-import { Eye, Info, AlertCircle, Clock, CheckCircle, Wrench } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Tooltip, Button } from 'antd';
+import { AlertCircle, Clock, CheckCircle, Info } from 'lucide-react';
 import { listTickets } from '../../services/ticketService';
+import TicketListView from '../../components/TicketListView';
 import InfoHistoryModal from './modals/InfoHistoryModal';
 
 const STATUS_CONFIG = [
@@ -11,24 +11,7 @@ const STATUS_CONFIG = [
   { key: 'Resuelto', label: 'Resueltos', color: '#1A8C06', icon: CheckCircle },
 ];
 
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const yyyy = d.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
-}
-
-function getDaysElapsed(dateStr) {
-  if (!dateStr) return 0;
-  const then = new Date(dateStr);
-  const now = new Date();
-  return Math.floor((now - then) / (1000 * 60 * 60 * 24));
-}
-
 export default function TechnicianDashboard() {
-  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [counts, setCounts] = useState({ Asignado: 0, 'En Proceso': 0, Resuelto: 0 });
   const [activeStatus, setActiveStatus] = useState('Asignado');
@@ -72,7 +55,6 @@ export default function TechnicianDashboard() {
 
   return (
     <div className="technician-dashboard">
-      {/* KPI ROW */}
       <div className="kpi-row">
         {STATUS_CONFIG.map((cfg) => {
           const Icon = cfg.icon;
@@ -97,77 +79,11 @@ export default function TechnicianDashboard() {
 
       <hr className="tech-dashboard-divider" />
 
-      {/* TICKET LIST */}
-      <div className="ticket-list">
-        <div className="ticket-list-header">
-          <h2>Mis tickets:</h2>
-          <Badge count={tickets.length} style={{ backgroundColor: '#006699' }} overflowCount={99} />
-        </div>
-
-        {loading ? (
-          <div className="loading-center"><Spin size="large" /></div>
-        ) : tickets.length === 0 ? (
-          <Empty description="No hay tickets en este estado" />
-        ) : (
-          <div className="ticket-list-body">
-            {tickets.map((ticket) => {
-              const days = getDaysElapsed(ticket.opened_at);
-              return (
-                <div key={ticket.id} className="ticket-row">
-                  {/* Col 1 — Código + Solicitante */}
-                  <div className="ticket-col ticket-col-info">
-                    <div className="ticket-number">{ticket.ticket_number}</div>
-                    <div className="ticket-solicitante">{ticket.requester_name || '—'}</div>
-                  </div>
-
-                  {/* Col 2 — Departamento */}
-                  <div className="ticket-col ticket-col-dept">
-                    <span className="ticket-dept-name">{ticket.department_name || '—'}</span>
-                  </div>
-
-                  {/* Col 3 — Categoría (solo si no es Asignado) */}
-                  <div className="ticket-col ticket-col-cat">
-                    {ticket.status !== 'Asignado' && ticket.category && (
-                      <Tag color="blue">{ticket.category}</Tag>
-                    )}
-                  </div>
-
-                  {/* Col 4 — Fecha + Días */}
-                  <div className="ticket-col ticket-col-date">
-                    <div className="ticket-date">{formatDate(ticket.opened_at)}</div>
-                    <div className={`ticket-days ${days >= 5 ? 'stale' : ''}`}>
-                      {days} {days === 1 ? 'Día' : 'Días'}
-                    </div>
-                  </div>
-
-                  {/* Col 5 — Acción */}
-                  <div className="ticket-col ticket-col-action">
-                    {ticket.status === 'Resuelto' ? (
-                      <Tooltip title="Ver detalles">
-                        <Button
-                          type="text"
-                          icon={<Eye size={18} />}
-                          className="btn-view"
-                          onClick={() => navigate(`/workspace/${ticket.id}`)}
-                        />
-                      </Tooltip>
-                    ) : (
-                      <Button
-                        type="primary"
-                        icon={<Wrench size={16} />}
-                        className="btn-atender"
-                        onClick={() => navigate(`/workspace/${ticket.id}`)}
-                      >
-                        Atender
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+      <TicketListView
+        tickets={tickets}
+        loading={loading}
+        title="Mis tickets"
+      />
 
       <div className="tech-dashboard-info-btn">
         <Tooltip title="Ver alcance de la vista">

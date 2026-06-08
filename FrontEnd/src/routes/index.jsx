@@ -8,6 +8,7 @@ import TechnicianDashboard from '../pages/technician/Dashboard';
 import TechnicianHistory from '../pages/technician/History';
 import Workspace from '../pages/technician/Workspace';
 import EquipmentInventory from '../pages/technician/EquipmentInventory';
+import AdminDashboard from '../pages/admin/Dashboard';
 import UserManagement from '../pages/admin/UserManagement';
 import AuditLog from '../pages/admin/AuditLog';
 import Settings from '../pages/admin/Settings';
@@ -17,7 +18,8 @@ import { useAuth } from '../context/AuthContext';
 
 function RoleDashboard() {
   const { user } = useAuth();
-  if (user?.role === 'technician' || user?.role === 'admin') return <TechnicianDashboard />;
+  if (user?.role === 'admin') return <AdminDashboard />;
+  if (user?.role === 'technician') return <TechnicianDashboard />;
   return <RequestorDashboard />;
 }
 
