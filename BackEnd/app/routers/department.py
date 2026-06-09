@@ -6,7 +6,7 @@ from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.department import DepartmentCreate, DepartmentUpdate, DepartmentResponse
 from BackEnd.app.schemas.pagination import DepartmentPaginated
 from BackEnd.app.services.department_service import (
-    create_department, update_department, delete_department, list_departments, get_department,
+    create_department, update_department, delete_department, toggle_department_status, list_departments, get_department,
 )
 
 router = APIRouter()
@@ -49,6 +49,15 @@ def get_department_endpoint(
     current_user: Users = Depends(RoleChecker(["admin"])),
 ):
     return get_department(db, department_id)
+
+
+@router.patch("/{department_id}/status")
+def toggle_department_status_endpoint(
+    department_id: str,
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(RoleChecker(["admin"])),
+):
+    return toggle_department_status(db, department_id, current_user)
 
 
 @router.delete("/{department_id}")

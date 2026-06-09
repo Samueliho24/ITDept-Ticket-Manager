@@ -101,6 +101,21 @@ def delete_department(db: Session, department_id: str, current_user: Users) -> d
     return {"detail": "Departamento eliminado exitosamente."}
 
 
+def toggle_department_status(db: Session, department_id: str, current_user: Users) -> dict:
+    department = db.query(Departments).filter(Departments.id == department_id).first()
+    if not department:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Departamento no encontrado.",
+        )
+    department.is_active = not department.is_active
+    action = "DEACTIVATE_DEPARTMENT" if not department.is_active else "ACTIVATE_DEPARTMENT"
+    _register_audit(db, current_user, action, department)
+    db.commit()
+    msg = "desactivado" if not department.is_active else "activado"
+    return {"detail": f"Departamento {msg} exitosamente."}
+
+
 def list_departments(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Departments], int]:
     query = db.query(Departments).filter(Departments.deleted_at.is_(None)).order_by(Departments.created_at.desc())
     total = query.count()

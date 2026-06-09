@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from BackEnd.app.core.db import Base
 import datetime, uuid
@@ -12,7 +12,7 @@ class Users(Base):
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False)
-    active = Column(Boolean, default=True)
+    active = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     department_id = Column(String(36), ForeignKey("departments.id"))
 

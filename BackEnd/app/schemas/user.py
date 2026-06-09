@@ -20,11 +20,15 @@ class UserUpdate(BaseModel):
 
 
 class UserStatusToggle(BaseModel):
-    active: bool
+    active: int
 
 
 class UserPasswordChange(BaseModel):
     password: str
+
+
+class UserDeleteResponse(BaseModel):
+    detail: str
 
 
 class UserResponse(BaseModel):
@@ -33,7 +37,7 @@ class UserResponse(BaseModel):
     lastname: str
     username: str
     role: str
-    active: bool
+    active: int
     department_id: Optional[str] = None
     created_at: Optional[datetime] = None
 

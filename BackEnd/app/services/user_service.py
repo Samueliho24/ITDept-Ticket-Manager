@@ -40,7 +40,7 @@ def create_user(db: Session, data: UserCreate, current_user: Users) -> Users:
         username=data.username,
         password=hash_password(data.password),
         role=data.role,
-        active=True,
+        active=1,
         department_id=data.department_id,
         created_at=datetime.now(timezone.utc),
     )
@@ -73,12 +73,22 @@ def update_user(db: Session, user_id: str, data: UserUpdate, current_user: Users
     return user
 
 
-def toggle_user_status(db: Session, user_id: str, active: bool, current_user: Users) -> Users:
+def toggle_user_status(db: Session, user_id: str, active: int, current_user: Users) -> Users:
+    if active not in (0, 1):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Valor de estado inválido. Use 0 (Inactivo) o 1 (Activo).",
+        )
     user = db.query(Users).filter(Users.id == user_id).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado.",
+        )
+    if user.active == -1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede cambiar el estado de un usuario eliminado.",
         )
     old_status = user.active
     user.active = active
@@ -89,6 +99,33 @@ def toggle_user_status(db: Session, user_id: str, active: bool, current_user: Us
     db.commit()
     db.refresh(user)
     return user
+
+
+def soft_delete_user(db: Session, user_id: str, current_user: Users) -> dict:
+    if current_user.id == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No puedes eliminar tu propio usuario.",
+        )
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado.",
+        )
+    if user.active == -1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El usuario ya fue eliminado.",
+        )
+    old_status = user.active
+    user.active = -1
+    _register_audit(db, current_user, "SOFT_DELETE_USER", user, {
+        "from_active": old_status,
+        "to_active": -1,
+    })
+    db.commit()
+    return {"detail": "Usuario eliminado permanentemente."}
 
 
 def change_user_password(db: Session, user_id: str, new_password: str, current_user: Users) -> Users:
@@ -106,7 +143,7 @@ def change_user_password(db: Session, user_id: str, new_password: str, current_u
 
 
 def list_users(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Users], int]:
-    query = db.query(Users).order_by(Users.created_at.desc())
+    query = db.query(Users).filter(Users.active >= 0).order_by(Users.created_at.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()
     return items, total

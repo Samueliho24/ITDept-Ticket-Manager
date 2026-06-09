@@ -67,7 +67,7 @@ def update_category(db: Session, category_id: str, data, current_user: Users) ->
     return category
 
 
-def deactivate_category(db: Session, category_id: str, current_user: Users) -> dict:
+def toggle_category_status(db: Session, category_id: str, current_user: Users) -> dict:
     category = db.query(Categories).filter(Categories.id == category_id).first()
     if not category:
         raise HTTPException(
@@ -82,8 +82,22 @@ def deactivate_category(db: Session, category_id: str, current_user: Users) -> d
     return {"detail": f"Categoría {msg} exitosamente."}
 
 
+def soft_delete_category(db: Session, category_id: str, current_user: Users) -> dict:
+    category = db.query(Categories).filter(Categories.id == category_id).first()
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Categoría no encontrada.",
+        )
+    category.deleted_at = datetime.now(timezone.utc)
+    category.is_active = False
+    _register_audit(db, current_user, "DELETE_CATEGORY", category)
+    db.commit()
+    return {"detail": "Categoría eliminada exitosamente."}
+
+
 def list_categories(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Categories], int]:
-    query = db.query(Categories).order_by(Categories.created_at.desc())
+    query = db.query(Categories).filter(Categories.deleted_at.is_(None)).order_by(Categories.created_at.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()
     return items, total

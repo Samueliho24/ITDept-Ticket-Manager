@@ -6,7 +6,7 @@ from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from BackEnd.app.schemas.pagination import CategoryPaginated
 from BackEnd.app.services.category_service import (
-    create_category, update_category, deactivate_category, list_categories, get_category,
+    create_category, update_category, toggle_category_status, soft_delete_category, list_categories, get_category,
 )
 
 router = APIRouter()
@@ -51,10 +51,19 @@ def get_category_endpoint(
     return get_category(db, category_id)
 
 
-@router.delete("/{category_id}")
-def deactivate_category_endpoint(
+@router.patch("/{category_id}/status")
+def toggle_category_status_endpoint(
     category_id: str,
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin"])),
 ):
-    return deactivate_category(db, category_id, current_user)
+    return toggle_category_status(db, category_id, current_user)
+
+
+@router.delete("/{category_id}")
+def delete_category_endpoint(
+    category_id: str,
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(RoleChecker(["admin"])),
+):
+    return soft_delete_category(db, category_id, current_user)

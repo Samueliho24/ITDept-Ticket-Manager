@@ -40,6 +40,12 @@ export const equipmentStatusList = [
   { label: 'Desincorporado', value: 'Desincorporado' },
 ];
 
+export const rolTypeList =[
+  { label: 'Administrador', value: 'admin' },
+  { label: 'Técnico', value: 'technician' },
+  { label: 'Solicitante', value: 'requestor' },
+]
+
 export function searchOnList(list, value) {
   return list.find((item) => item.value === value)?.label || value;
 }

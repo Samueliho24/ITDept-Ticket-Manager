@@ -189,11 +189,11 @@ export default function HelpSupport() {
         <div className="contact-items">
           <div className="contact-item">
             <Mail size={16} />
-            <span>tic.odontologia@luz.edu.ve</span>
+            <span>dptotic.facoluz@gmail.com</span>
           </div>
           <div className="contact-item">
             <Phone size={16} />
-            <span>+58 261 759 1234</span>
+            <span>+58 414 693 2141</span>
           </div>
         </div>
       </div>

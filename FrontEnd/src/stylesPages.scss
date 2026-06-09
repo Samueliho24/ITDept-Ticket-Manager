@@ -1666,7 +1666,7 @@ a {
   .admin-users-table {
     .ant-table-thead > tr > th {
       text-transform: uppercase;
-      font-size: 12px;
+      font-size: 14px;
       letter-spacing: 0.5px;
       color: $color-text-light;
       background-color: $color-card-bg;
@@ -1674,6 +1674,67 @@ a {
 
     .ant-table-tbody > tr:hover > td {
       background-color: $color-table-hover;
+    }
+  }
+}
+
+.user-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  &.active {
+    background-color: rgba($color-success, 0.12);
+    color: $color-success;
+
+    .status-dot {
+      background-color: $color-success;
+    }
+  }
+
+  &.inactive {
+    background-color: rgba($color-danger, 0.12);
+    color: $color-danger;
+
+    .status-dot {
+      background-color: $color-danger;
+    }
+  }
+}
+
+.user-actions-bar {
+  display: flex;
+  gap: 2px;
+  flex-wrap: nowrap;
+}
+
+.user-modal-warning {
+  background-color: rgba($color-primary, 0.06);
+  border-left: 4px solid $color-primary;
+  padding: 16px 20px;
+  border-radius: $border-radius-sm;
+  font-size: 14px;
+  line-height: 1.7;
+  color: $color-text;
+
+  &--danger {
+    background-color: rgba($color-danger, 0.08);
+    border-left-color: $color-danger;
+
+    strong {
+      color: $color-danger;
     }
   }
 }

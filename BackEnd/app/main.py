@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
 from .core.db import engine, Base, SessionLocal
 from .core.userDefault import default_admin
 from .routers.auth import router as auth_router
@@ -13,9 +14,23 @@ from .routers.notifications import router as notifications_router
 from .routers.metrics import router as metrics_router
 from .routers.categories import router as categories_router
 
+def _run_migrations():
+    """Run pending DB schema migrations (safe for repeated calls)."""
+    inspector = inspect(engine)
+    eq_cols = {col["name"] for col in inspector.get_columns("equipment")}
+    cat_cols = {col["name"] for col in inspector.get_columns("categories")}
+    with SessionLocal() as db:
+        if "assigned_person" not in eq_cols:
+            db.execute(text("ALTER TABLE equipment ADD COLUMN assigned_person VARCHAR(200) NULL COMMENT 'Persona asignada'"))
+            db.commit()
+        if "deleted_at" not in cat_cols:
+            db.execute(text("ALTER TABLE categories ADD COLUMN deleted_at DATETIME NULL"))
+            db.commit()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _run_migrations()
     db = SessionLocal()
     try:
         default_admin(db)

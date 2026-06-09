@@ -9,3 +9,4 @@ class Categories(Base):
     name = Column(String(100), unique=True, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    deleted_at = Column(DateTime, nullable=True)

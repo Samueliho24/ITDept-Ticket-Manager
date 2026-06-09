@@ -5,12 +5,12 @@ from BackEnd.app.core.security import RoleChecker
 from BackEnd.app.models.users import Users
 from BackEnd.app.schemas.user import (
     UserCreate, UserUpdate, UserStatusToggle,
-    UserPasswordChange, UserResponse,
+    UserPasswordChange, UserResponse, UserDeleteResponse,
 )
 from BackEnd.app.schemas.pagination import UserPaginated
 from BackEnd.app.services.user_service import (
     create_user, update_user, toggle_user_status, change_user_password,
-    list_users, get_user,
+    list_users, get_user, soft_delete_user,
 )
 
 router = APIRouter()
@@ -63,6 +63,15 @@ def toggle_user_status_endpoint(
     current_user: Users = Depends(RoleChecker(["admin"])),
 ):
     return toggle_user_status(db, user_id, data.active, current_user)
+
+
+@router.delete("/{user_id}", response_model=UserDeleteResponse)
+def soft_delete_user_endpoint(
+    user_id: str,
+    db: Session = Depends(getDb),
+    current_user: Users = Depends(RoleChecker(["admin"])),
+):
+    return soft_delete_user(db, user_id, current_user)
 
 
 @router.patch("/{user_id}/password", response_model=UserResponse)
