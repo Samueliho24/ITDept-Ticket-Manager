@@ -56,7 +56,7 @@ export default function ReportTicketModal({ onSuccess }) {
       cancelText="Cancelar"
       destroyOnClose
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" requiredMark={false}>
         <Form.Item
           name="department_id"
           label="Área / Departamento"

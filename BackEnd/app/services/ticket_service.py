@@ -39,11 +39,12 @@ def _enrich_tickets_with_names(db: Session, tickets: list[Tickets]):
         for t in tickets:
             d = depts.get(t.department_id)
             t.department_name = d.name if d else None
-            t.ticket_number = (
-                f"{d.code}-{t.opened_at.strftime('%d%m%y')}-{t.daily_sequence:02d}"
-                if d and t.opened_at and t.daily_sequence is not None
-                else None
-            )
+            if t.ticket_number is None:
+                t.ticket_number = (
+                    f"{d.code}-{t.opened_at.strftime('%d%m%y')}-{t.daily_sequence:02d}"
+                    if d and t.opened_at and t.daily_sequence is not None
+                    else None
+                )
 
 
 ALLOWED_TRANSITIONS = {
@@ -53,6 +54,13 @@ ALLOWED_TRANSITIONS = {
 
 VALID_TICKET_STATUSES = {"Abierto", "Asignado", "En Proceso", "Pendiente", "Resuelto", "Cerrado", "Anulado"}
 VALID_PRIORITIES = {"Baja", "Media", "Alta", "Crítica"}
+
+
+def _resolve_ticket_identifier(db: Session, identifier: str) -> Optional[Tickets]:
+    ticket = db.query(Tickets).filter(Tickets.id == identifier).first()
+    if not ticket:
+        ticket = db.query(Tickets).filter(Tickets.ticket_number == identifier).first()
+    return ticket
 
 
 def _register_ticket_history(db: Session, ticket: Tickets, previous_status: str, new_status: str, comment: str = None, action: str = None, reason: str = None):
@@ -109,10 +117,14 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
             .scalar()
         )
         daily_sequence = (max_seq or 0) + 1
+        dept = db.query(Departments).filter(Departments.id == data.department_id).first()
+        ticket_number = f"{dept.code}-{now.strftime('%d%m%y')}-{daily_sequence:02d}" if dept else None
     else:
         daily_sequence = 1
+        ticket_number = None
     ticket = Tickets(
         id=str(uuid.uuid4()),
+        ticket_number=ticket_number,
         title=data.title,
         description=data.description,
         priority=data.priority,
@@ -181,7 +193,7 @@ def list_tickets(
 
 
 def get_ticket(db: Session, ticket_id: str, current_user: Users) -> Tickets:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     if current_user.role == "requestor" and ticket.requester_id != current_user.id:
@@ -194,7 +206,7 @@ def get_ticket(db: Session, ticket_id: str, current_user: Users) -> Tickets:
 
 
 def get_ticket_history(db: Session, ticket_id: str, current_user: Users) -> list[TicketHistory]:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     if current_user.role == "requestor" and ticket.requester_id != current_user.id:
@@ -212,7 +224,7 @@ def get_ticket_history(db: Session, ticket_id: str, current_user: Users) -> list
 
 
 def assign_ticket(db: Session, ticket_id: str, data: TicketAssign, current_user: Users) -> Tickets:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     technician = db.query(Users).filter(Users.id == data.technician_id, Users.role.in_(["technician", "admin"])).first()
@@ -221,6 +233,13 @@ def assign_ticket(db: Session, ticket_id: str, data: TicketAssign, current_user:
     previous_status = ticket.status
     ticket.assigned_technician_id = data.technician_id
     ticket.status = "Asignado"
+    if data.priority:
+        if data.priority not in VALID_PRIORITIES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Prioridad inválida. Permitidas: {', '.join(sorted(VALID_PRIORITIES))}.",
+            )
+        ticket.priority = data.priority
     _register_ticket_history(db, ticket, previous_status, "Asignado", action=f"Asignado a {technician.name} {technician.lastname}")
     _register_audit(db, current_user, "assign_ticket", ticket, {
         "technician_id": data.technician_id,
@@ -246,7 +265,7 @@ def update_ticket_status(db: Session, ticket_id: str, data: TicketStatusUpdate, 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Transición de estado no permitida. Solo: {', '.join(ALLOWED_TRANSITIONS)}.",
         )
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     previous_status = ticket.status
@@ -269,7 +288,7 @@ def update_ticket_status(db: Session, ticket_id: str, data: TicketStatusUpdate, 
 
 
 def resolve_ticket(db: Session, ticket_id: str, data: TicketResolve, current_user: Users) -> Tickets:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     previous_status = ticket.status
@@ -317,7 +336,7 @@ def resolve_ticket(db: Session, ticket_id: str, data: TicketResolve, current_use
 
 
 def update_ticket_category(db: Session, ticket_id: str, data: TicketCategoryUpdate, current_user: Users) -> Tickets:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     old_category = ticket.category
@@ -345,7 +364,7 @@ def update_ticket_category(db: Session, ticket_id: str, data: TicketCategoryUpda
 
 
 def cancel_ticket(db: Session, ticket_id: str, data: TicketCancel, current_user: Users) -> Tickets:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     if current_user.role == "requestor" and ticket.requester_id != current_user.id:
@@ -373,7 +392,7 @@ def cancel_ticket(db: Session, ticket_id: str, data: TicketCancel, current_user:
 
 
 def rate_ticket(db: Session, ticket_id: str, data: RateRequest, current_user: Users) -> TicketRating:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     if current_user.role == "requestor" and ticket.requester_id != current_user.id:
@@ -413,7 +432,7 @@ def rate_ticket(db: Session, ticket_id: str, data: RateRequest, current_user: Us
 
 
 def get_ticket_rating(db: Session, ticket_id: str, current_user: Users) -> Optional[TicketRating]:
-    ticket = db.query(Tickets).filter(Tickets.id == ticket_id).first()
+    ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
     if current_user.role == "requestor" and ticket.requester_id != current_user.id:

@@ -7,7 +7,7 @@ import useDashboardMetrics from '../../hooks/useDashboardMetrics';
 import { listTickets } from '../../services/ticketService';
 
 export default function AdminDashboard() {
-  const { metrics, loading: metricsLoading } = useDashboardMetrics();
+  const { metrics, loading: metricsLoading, refetch } = useDashboardMetrics();
   const [tickets, setTickets] = useState([]);
   const [ticketsLoading, setTicketsLoading] = useState(true);
 
@@ -39,6 +39,7 @@ export default function AdminDashboard() {
         resolvedByMonth={metrics?.resolved_by_month || []}
         departmentBreakdown={metrics?.department_breakdown || []}
         loading={metricsLoading}
+        onToggleCancelled={(exclude) => refetch({ exclude_cancelled: exclude })}
       />
 
       <TicketListView

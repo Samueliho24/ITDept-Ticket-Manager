@@ -12,7 +12,7 @@ def get_resolution_hours(closed_at, opened_at):
     return None
 
 
-def get_metrics(db: Session) -> MetricsResponse:
+def get_metrics(db: Session, exclude_cancelled: bool = False) -> MetricsResponse:
     now = func.now()
 
     # --- 1. MTTR: Average resolution time (hours) for resolved tickets ---
@@ -77,12 +77,15 @@ def get_metrics(db: Session) -> MetricsResponse:
         ))
 
     # --- 6. Department breakdown ---
-    dept_rows = db.query(
+    dept_query = db.query(
         Departments.name.label('dept_name'),
         func.count(Tickets.id).label('count'),
     ).join(
         Tickets, Tickets.department_id == Departments.id, isouter=True
-    ).group_by(
+    )
+    if exclude_cancelled:
+        dept_query = dept_query.filter(Tickets.status != 'Anulado')
+    dept_rows = dept_query.group_by(
         Departments.name,
     ).order_by(
         func.count(Tickets.id).desc(),

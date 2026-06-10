@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { Tag, Button, Spin, Empty, Tooltip } from 'antd';
 import { PlusCircle, Eye, XCircle } from 'lucide-react';
 import { listTickets } from '../../services/ticketService';
@@ -27,13 +28,14 @@ function getDaysElapsed(dateStr) {
   if (!dateStr) return 0;
   const then = new Date(dateStr);
   const now = new Date();
-  return Math.floor((now - then) / (1000 * 60 * 60 * 24));
+  return Math.max(0, Math.floor((now - then) / (1000 * 60 * 60 * 24)));
 }
 
 export default function RequestorDashboard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const { openReport, openDetail, openCancel } = useModals();
+  const { refreshKey } = useOutletContext();
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
@@ -53,7 +55,7 @@ export default function RequestorDashboard() {
 
   useEffect(() => {
     startTransition(() => { fetchTickets(); });
-  }, [fetchTickets]);
+  }, [fetchTickets, refreshKey]);
 
   return (
     <div className="requestor-dashboard">

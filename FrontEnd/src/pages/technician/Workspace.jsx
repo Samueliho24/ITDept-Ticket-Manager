@@ -12,6 +12,7 @@ export default function Workspace() {
   const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ticketStatus, setTicketStatus] = useState(null);
   const [category, setCategory] = useState(null);
   const [equipmentSearch, setEquipmentSearch] = useState('');
   const [equipmentResults, setEquipmentResults] = useState([]);
@@ -20,6 +21,7 @@ export default function Workspace() {
   const [equipSearching, setEquipSearching] = useState(false);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [categoryUpdating, setCategoryUpdating] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   useEffect(() => {
     if (!ticketId) return;
@@ -29,6 +31,7 @@ export default function Workspace() {
         const t = res.data;
         setTicket(t);
         setCategory(t.category || null);
+        setTicketStatus(t.status);
         if (t.equipment_id) setSelectedEquipment(t.equipment_id);
         if (t.status === 'Asignado') {
           updateTicketStatus(ticketId, { status: 'En Proceso' })
@@ -74,9 +77,24 @@ export default function Workspace() {
     try {
       const res = await listEquipments({ search: value, limit: 8 });
       setEquipmentResults(res.data.items || []);
-    } catch { setEquipmentResults([]); }
+    } catch (err) { console.error('Error al buscar equipos:', err); setEquipmentResults([]); }
     finally { setEquipSearching(false); }
   }, []);
+
+  const handleStatusChange = async (newStatus) => {
+    setTicketStatus(newStatus);
+    setStatusUpdating(true);
+    try {
+      await updateTicketStatus(ticketId, { status: newStatus });
+      setTicket((prev) => ({ ...prev, status: newStatus }));
+      message.success(`Estado actualizado a "${newStatus}".`);
+    } catch {
+      message.error('Error al cambiar el estado del ticket.');
+      setTicketStatus(ticket?.status || null);
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
 
   const handleSelectEquipment = (eq) => {
     setSelectedEquipment(eq.id);
@@ -97,7 +115,7 @@ export default function Workspace() {
         <Button type="text" icon={<ArrowLeft size={18} />} onClick={() => navigate('/dashboard')}>
           Volver al Dashboard
         </Button>
-        <Tag color="blue" className="workspace-id">Ticket #{ticket.id.slice(0, 8)}</Tag>
+        <Tag color="blue" className="workspace-id">Ticket {ticket.ticket_number || `#${ticket.id.slice(0, 8)}`}</Tag>
       </div>
 
       <div className="workspace-panels">
@@ -161,6 +179,23 @@ export default function Workspace() {
               options={categoryOptions}
               loading={categoryUpdating}
               allowClear
+            />
+          </div>
+
+          <Divider />
+
+          <div className="workspace-tool-section">
+            <h4>Estado del Soporte</h4>
+            <Select
+              placeholder="Cambiar estado"
+              style={{ width: '100%' }}
+              value={ticketStatus}
+              onChange={handleStatusChange}
+              options={[
+                { label: 'En Proceso', value: 'En Proceso' },
+                { label: 'Pendiente', value: 'Pendiente' },
+              ]}
+              loading={statusUpdating}
             />
           </div>
 

@@ -4,6 +4,7 @@ import { Check, Users, Clock, AlertCircle, User } from 'lucide-react';
 import { listTickets, assignTicket } from '../../services/ticketService';
 import { listUsers } from '../../services/userService';
 import { useAppContext } from '../../context/AppContext';
+import { priorityList } from '../../constants/lists';
 
 function getDaysElapsed(dateStr) {
   if (!dateStr) return 0;
@@ -28,6 +29,7 @@ export default function TicketAssignment() {
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(new Set());
   const [assignments, setAssignments] = useState({});
+  const [priorities, setPriorities] = useState({});
   const [counts, setCounts] = useState({
     unassigned: 0,
     freeTechs: 0,
@@ -53,7 +55,8 @@ export default function TicketAssignment() {
         freeTechs: techsAndAdmins.length,
         inProgress: inProgressRes.data.total || 0,
       });
-    } catch {
+    } catch (err) {
+      console.error('Error al cargar datos de asignación:', err);
       setTickets([]);
       setUsers([]);
     } finally {
@@ -73,7 +76,9 @@ export default function TicketAssignment() {
     }
     setConfirming((prev) => new Set(prev).add(ticketId));
     try {
-      await assignTicket(ticketId, { technician_id: technicianId });
+      const payload = { technician_id: technicianId };
+      if (priorities[ticketId]) payload.priority = priorities[ticketId];
+      await assignTicket(ticketId, payload);
       const tech = users.find((u) => u.id === technicianId);
       messageApi.success(`Ticket asignado a ${tech?.name || ''} ${tech?.lastname || ''}.`);
       setTickets((prev) => prev.filter((t) => t.id !== ticketId));
@@ -122,6 +127,21 @@ export default function TicketAssignment() {
         if (!v) return '—';
         return v.length > 60 ? `${v.slice(0, 60)}...` : v;
       },
+    },
+    {
+      title: 'Prioridad',
+      key: 'priority',
+      width: 120,
+      render: (_, record) => (
+        <Select
+          placeholder={record.priority || '—'}
+          size="small"
+          style={{ width: '100%' }}
+          value={priorities[record.id] || record.priority || undefined}
+          onChange={(val) => setPriorities((prev) => ({ ...prev, [record.id]: val }))}
+          options={priorityList}
+        />
+      ),
     },
     {
       title: 'Ubicación',

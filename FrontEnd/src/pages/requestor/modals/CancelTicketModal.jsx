@@ -46,7 +46,7 @@ export default function CancelTicketModal({ onSuccess }) {
     >
       {ticket && (
         <div>
-          <p>¿Estás seguro de que deseas anular el ticket <strong>#{ticket.id.slice(0, 8)}</strong>?</p>
+          <p>¿Estás seguro de que deseas anular el ticket <strong>{ticket.ticket_number || `#${ticket.id.slice(0, 8)}`}</strong>?</p>
           <Input.TextArea
             rows={3}
             value={reason}

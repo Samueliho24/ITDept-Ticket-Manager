@@ -16,6 +16,7 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
 
   useEffect(() => {
     if (equipment && open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedType(equipment.equipment_type);
       const specs = equipment.technical_specifications || {};
       const values = {

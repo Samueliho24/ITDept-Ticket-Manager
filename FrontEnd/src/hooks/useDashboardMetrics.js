@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getMetrics } from '../services/metricsService';
 
 export default function useDashboardMetrics() {
@@ -7,34 +7,23 @@ export default function useDashboardMetrics() {
   const [error, setError] = useState(null);
   const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
-
-    getMetrics()
-      .then((res) => {
-        if (mountedRef.current) {
-          setMetrics(res.data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (mountedRef.current) {
-          setError(err.response?.data?.detail || 'Error al cargar métricas');
-          setLoading(false);
-        }
-      });
-
-    return () => { mountedRef.current = false; };
-  }, []);
-
-  const refetch = () => {
+  const refetch = useCallback((params) => {
     setLoading(true);
     setError(null);
+    getMetrics(params)
+      .then((res) => { if (mountedRef.current) setMetrics(res.data); })
+      .catch((err) => { if (mountedRef.current) setError(err.response?.data?.detail || 'Error al cargar métricas'); })
+      .finally(() => { if (mountedRef.current) setLoading(false); });
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
     getMetrics()
-      .then((res) => setMetrics(res.data))
-      .catch((err) => setError(err.response?.data?.detail || 'Error al cargar métricas'))
-      .finally(() => setLoading(false));
-  };
+      .then((res) => { if (mountedRef.current) setMetrics(res.data); })
+      .catch((err) => { if (mountedRef.current) setError(err.response?.data?.detail || 'Error al cargar métricas'); })
+      .finally(() => { if (mountedRef.current) setLoading(false); });
+    return () => { mountedRef.current = false; };
+  }, []);
 
   return { metrics, loading, error, refetch };
 }

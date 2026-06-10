@@ -83,7 +83,7 @@ export default function TicketListView({ tickets, loading, title = 'Tickets', sh
                         type="text"
                         icon={<Eye size={18} />}
                         className="btn-view"
-                        onClick={() => navigate(`/workspace/${ticket.id}`)}
+                        onClick={() => navigate(`/workspace/${ticket.ticket_number || ticket.id}`)}
                       />
                     </Tooltip>
                   ) : (
@@ -91,7 +91,7 @@ export default function TicketListView({ tickets, loading, title = 'Tickets', sh
                       type="primary"
                       icon={<Wrench size={16} />}
                       className="btn-atender"
-                      onClick={() => navigate(`/workspace/${ticket.id}`)}
+                      onClick={() => navigate(`/workspace/${ticket.ticket_number || ticket.id}`)}
                     >
                       Atender
                     </Button>

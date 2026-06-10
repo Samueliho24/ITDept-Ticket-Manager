@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../layout/MainLayout';
 import Login from '../pages/common/Login';
+import PublicReport from '../pages/public/PublicReport';
+import PublicTicketView from '../pages/public/PublicTicketView';
 import RequestorDashboard from '../pages/requestor/Dashboard';
 import RequestorHistory from '../pages/requestor/History';
 import TechnicianDashboard from '../pages/technician/Dashboard';
@@ -33,6 +35,8 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/reportar" element={<PublicReport />} />
+      <Route path="/reportar/:ticketNumber" element={<PublicTicketView />} />
 
       <Route element={<ProtectedRoute allowedRoles={['admin', 'technician', 'requestor']} />}>
         <Route element={<MainLayout />}>

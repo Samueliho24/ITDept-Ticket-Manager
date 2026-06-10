@@ -1,6 +1,6 @@
 import { useState, useEffect, startTransition } from 'react';
 import { Modal, Timeline, Steps, Tag, Rate, Spin, Descriptions, Empty } from 'antd';
-import { getTicketHistory, rateTicket } from '../../../services/ticketService';
+import { getTicket, getTicketHistory, rateTicket } from '../../../services/ticketService';
 import { useModals } from '../../../context/ModalContext';
 
 const STEP_MAP = {
@@ -22,6 +22,7 @@ const STEP_STATUS = {
 
 export default function TicketDetailModal() {
   const { detailTicket, closeDetail } = useModals();
+  const [ticket, setTicket] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
@@ -32,7 +33,10 @@ export default function TicketDetailModal() {
     if (detailTicket) {
       startTransition(() => { setRating(0); });
       startTransition(() => { setRatingSubmitted(detailTicket.rated || false); });
-      startTransition(() => { setLoading(true); });
+      startTransition(() => { setTicket(detailTicket); setLoading(true); });
+      getTicket(detailTicket.id)
+        .then((res) => setTicket(res.data))
+        .catch(() => {});
       getTicketHistory(detailTicket.id)
         .then((res) => { setHistory(res.data.items || res.data); })
         .catch(() => setHistory([]))
@@ -55,29 +59,29 @@ export default function TicketDetailModal() {
   };
 
   const stepsOrder = ['Abierto', 'Asignado', 'En Proceso', 'Resuelto', 'Cerrado'];
-  const currentStep = STEP_MAP[detailTicket?.status] ?? 0;
+  const currentStep = STEP_MAP[ticket?.status] ?? 0;
 
   return (
     <Modal
-      title={`Ticket #${detailTicket?.id?.slice(0, 8) || ''}`}
+      title={`Ticket ${ticket?.ticket_number || `#${ticket?.id?.slice(0, 8) || ''}`}`}
       open={!!detailTicket}
       onCancel={closeDetail}
       footer={null}
       width={640}
       destroyOnClose
     >
-      {!detailTicket ? null : (
+      {!ticket ? null : (
         <div className="ticket-detail-modal">
           <Descriptions column={1} size="small" bordered>
-            <Descriptions.Item label="Título">{detailTicket.title}</Descriptions.Item>
+            <Descriptions.Item label="Título">{ticket.title}</Descriptions.Item>
             <Descriptions.Item label="Estado">
-              <Tag>{detailTicket.status}</Tag>
+              <Tag>{ticket.status}</Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="Prioridad">{detailTicket.priority}</Descriptions.Item>
-            <Descriptions.Item label="Categoría">{detailTicket.category || '—'}</Descriptions.Item>
-            <Descriptions.Item label="Descripción">{detailTicket.description || '—'}</Descriptions.Item>
-            {detailTicket.assigned_to_name && (
-              <Descriptions.Item label="Técnico Asignado">{detailTicket.assigned_to_name}</Descriptions.Item>
+            <Descriptions.Item label="Prioridad">{ticket.priority}</Descriptions.Item>
+            <Descriptions.Item label="Categoría">{ticket.category || '—'}</Descriptions.Item>
+            <Descriptions.Item label="Descripción">{ticket.description || '—'}</Descriptions.Item>
+            {ticket.assigned_to_name && (
+              <Descriptions.Item label="Técnico Asignado">{ticket.assigned_to_name}</Descriptions.Item>
             )}
 
           </Descriptions>
@@ -86,7 +90,7 @@ export default function TicketDetailModal() {
             <h4>Progreso</h4>
             <Steps
               current={currentStep}
-              status={detailTicket.status === 'Anulado' ? 'error' : STEP_STATUS[detailTicket.status] || 'process'}
+              status={ticket.status === 'Anulado' ? 'error' : STEP_STATUS[ticket.status] || 'process'}
               items={stepsOrder.map((s) => ({ title: s }))}
               size="small"
             />
@@ -116,7 +120,7 @@ export default function TicketDetailModal() {
             )}
           </div>
 
-          {detailTicket.status === 'Resuelto' && !ratingSubmitted && (
+          {ticket.status === 'Resuelto' && !ratingSubmitted && (
             <div className="detail-section rating-section">
               <h4>Califica la resolución (anónimo)</h4>
               <Rate onChange={handleRate} value={rating} disabled={ratingLoading} />

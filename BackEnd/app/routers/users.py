@@ -27,7 +27,7 @@ def create_user_endpoint(
 
 @router.get("/", response_model=UserPaginated)
 def list_users_endpoint(
-    limit: int = Query(10, ge=1, le=100, description="Registros por página"),
+    limit: int = Query(10, ge=1, le=1000, description="Registros por página"),
     offset: int = Query(0, ge=0, description="Desplazamiento"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin"])),

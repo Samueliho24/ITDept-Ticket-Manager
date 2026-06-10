@@ -1,3 +1,3 @@
 import api from './api';
 
-export const getMetrics = () => api.get('/admin/metrics');
+export const getMetrics = (params) => api.get('/admin/metrics', { params });

@@ -65,7 +65,7 @@ export default function RequestorHistory() {
       dataIndex: 'id',
       key: 'id',
       width: 100,
-      render: (id) => <span className="ticket-id">#{id.slice(0, 8)}</span>,
+      render: (_, record) => <span className="ticket-id">{record.ticket_number || `#${record.id.slice(0, 8)}`}</span>,
     },
     {
       title: 'Título',
@@ -86,12 +86,6 @@ export default function RequestorHistory() {
       key: 'category',
       width: 130,
       render: (cat) => cat || '—',
-    },
-    {
-      title: 'Prioridad',
-      dataIndex: 'priority',
-      key: 'priority',
-      width: 100,
     },
     {
       title: 'Fecha',

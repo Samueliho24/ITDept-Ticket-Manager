@@ -14,6 +14,7 @@ class TicketCreate(BaseModel):
 
 class TicketAssign(BaseModel):
     technician_id: str
+    priority: Optional[str] = None
 
 
 class TicketStatusUpdate(BaseModel):
