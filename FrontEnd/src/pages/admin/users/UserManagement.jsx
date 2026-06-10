@@ -121,6 +121,13 @@ export default function UserManagement() {
       key: 'username',
     },
     {
+      title: 'Teléfono',
+      dataIndex: 'phone',
+      key: 'phone',
+      render: (val) => val || '—',
+      width: 150,
+    },
+    {
       title: 'Departamento',
       key: 'department',
       render: (_, r) => deptMap.get(r.department_id) || '—',

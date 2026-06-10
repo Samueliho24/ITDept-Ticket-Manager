@@ -24,6 +24,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
           lastname: values.lastname,
           role: values.role,
           department_id: values.department_id || null,
+          phone: values.phone || null,
         });
         messageApi.success('Usuario actualizado correctamente.');
       } else {
@@ -34,6 +35,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
           password: values.password,
           role: values.role,
           department_id: values.department_id || null,
+          phone: values.phone || null,
         });
         messageApi.success('Usuario creado correctamente.');
       }
@@ -64,95 +66,114 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
       }
     >
       <Form form={form} layout="vertical" preserve={false} requiredMark={false}>
-        <Space style={{ width: '100%' }} size="middle">
-          <Form.Item
-            name="name"
-            label="Nombre"
-            rules={[{ required: true, message: 'Campo requerido' }]}
-            style={{ flex: 1 }}
-            initialValue={user?.name}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="lastname"
-            label="Apellido"
-            rules={[{ required: true, message: 'Campo requerido' }]}
-            style={{ flex: 1 }}
-            initialValue={user?.lastname}
-          >
-            <Input />
-          </Form.Item>
-        </Space>
-
-        <Form.Item
-          name="username"
-          label="Usuario"
-          rules={[
-            { required: true, message: 'Campo requerido' },
-            { min: 3, message: 'Mínimo 3 caracteres' },
-          ]}
-          initialValue={user?.username}
-        >
-          <Input disabled={isEditing} />
-        </Form.Item>
-
-        {!isEditing && (
-          <Space style={{ width: '100%' }} size="middle">
+        <div style={{ marginBottom: 24 }}>
+          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
-              name="password"
-              label="Contraseña"
-              rules={[
-                { required: true, message: 'Campo requerido' },
-                { min: 6, message: 'Mínimo 6 caracteres' },
-              ]}
-              style={{ flex: 1 }}
+              name="name"
+              label="Nombre"
+              rules={[{ required: true, message: 'Campo requerido' }]}
+              style={{ marginBottom: 0 }}
+              initialValue={user?.name}
             >
-              <Input.Password />
+              <Input />
             </Form.Item>
             <Form.Item
-              name="confirmPassword"
-              label="Confirmar Contraseña"
-              dependencies={['password']}
-              rules={[
-                { required: true, message: 'Campo requerido' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) return Promise.resolve();
-                    return Promise.reject(new Error('Las contraseñas no coinciden'));
-                  },
-                }),
-              ]}
-              style={{ flex: 1 }}
+              name="lastname"
+              label="Apellido"
+              rules={[{ required: true, message: 'Campo requerido' }]}
+              style={{ marginBottom: 0 }}
+              initialValue={user?.lastname}
             >
-              <Input.Password />
+              <Input />
             </Form.Item>
           </Space>
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
+          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+            <Form.Item
+              name="username"
+              label="Usuario"
+              rules={[
+                { required: true, message: 'Campo requerido' },
+                { min: 3, message: 'Mínimo 3 caracteres' },
+              ]}
+              style={{ marginBottom: 0 }}
+              initialValue={user?.username}
+            >
+              <Input disabled={isEditing} />
+            </Form.Item>
+            <Form.Item
+              name="phone"
+              label="Teléfono"
+              style={{ marginBottom: 0 }}
+              initialValue={user?.phone}
+            >
+              <Input placeholder="Ej: +58 412-1234567" />
+            </Form.Item>
+          </Space>
+        </div>
+
+        {!isEditing && (
+          <div style={{ marginBottom: 24 }}>
+            <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+              <Form.Item
+                name="password"
+                label="Contraseña"
+                rules={[
+                  { required: true, message: 'Campo requerido' },
+                  { min: 6, message: 'Mínimo 6 caracteres' },
+                ]}
+                style={{ marginBottom: 0 }}
+              >
+                <Input.Password />
+              </Form.Item>
+              <Form.Item
+                name="confirmPassword"
+                label="Confirmar Contraseña"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: 'Campo requerido' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) return Promise.resolve();
+                      return Promise.reject(new Error('Las contraseñas no coinciden'));
+                    },
+                  }),
+                ]}
+                style={{ marginBottom: 0 }}
+              >
+                <Input.Password />
+              </Form.Item>
+            </Space>
+          </div>
         )}
 
-        <Space style={{ width: '100%' }} size="middle">
-          <Form.Item
-            name="role"
-            label="Rol"
-            rules={[{ required: true, message: 'Campo requerido' }]}
-            style={{ flex: 1 }}
-            initialValue={user?.role}
-          >
-            <Select options={rolTypeList} />
-          </Form.Item>
-          <Form.Item
-            name="department_id"
-            label="Departamento"
-            style={{ flex: 1 }}
-            initialValue={user?.department_id || undefined}
-          >
-            <Select
-              allowClear
-              placeholder="Seleccionar departamento"
-              options={departments.map((d) => ({ label: d.name, value: d.id }))}
-            />
-          </Form.Item>
-        </Space>
+        <div style={{ marginBottom: 0 }}>
+          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+            <Form.Item
+              name="role"
+              label="Rol"
+              rules={[{ required: true, message: 'Campo requerido' }]}
+              style={{ marginBottom: 0 }}
+              initialValue={user?.role}
+            >
+              <Select options={rolTypeList} />
+            </Form.Item>
+            <Form.Item
+              name="department_id"
+              label="Departamento"
+              style={{ marginBottom: 0 }}
+              initialValue={user?.department_id || undefined}
+            >
+              <Select
+                allowClear
+                placeholder="Seleccionar departamento"
+                options={departments.map((d) => ({ label: d.name, value: d.id }))}
+              />
+            </Form.Item>
+          </Space>
+        </div>
       </Form>
     </Modal>
   );

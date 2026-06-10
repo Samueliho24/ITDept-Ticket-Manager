@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
     password: str
     role: str = "requestor"
     department_id: Optional[str] = None
+    phone: Optional[str] = None
 
 
 class UserUpdate(BaseModel):
@@ -17,6 +18,7 @@ class UserUpdate(BaseModel):
     lastname: Optional[str] = None
     role: Optional[str] = None
     department_id: Optional[str] = None
+    phone: Optional[str] = None
 
 
 class UserStatusToggle(BaseModel):
@@ -36,6 +38,7 @@ class UserResponse(BaseModel):
     name: str
     lastname: str
     username: str
+    phone: Optional[str] = None
     role: str
     active: int
     department_id: Optional[str] = None

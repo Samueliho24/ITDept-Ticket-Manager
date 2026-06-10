@@ -40,6 +40,7 @@ def create_user(db: Session, data: UserCreate, current_user: Users) -> Users:
         username=data.username,
         password=hash_password(data.password),
         role=data.role,
+        phone=data.phone,
         active=1,
         department_id=data.department_id,
         created_at=datetime.now(timezone.utc),

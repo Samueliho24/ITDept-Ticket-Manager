@@ -28,6 +28,7 @@ def default_admin(db: Session) -> None:
             username="admin",
             password=hash_password("admin"),
             role="admin",
+            phone=None,
             active=True,
             department_id=dept.id,
             created_at=datetime.now(timezone.utc),

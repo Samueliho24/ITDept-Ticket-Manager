@@ -34,7 +34,7 @@ def register_login_audit(db: Session, user: Users):
         action="login",
         affected_table="users",
         record_id=user.id,
-        details="Inicio de sesión exitoso",
+        details={"message": "Inicio de sesión exitoso"},
         timestamp=datetime.now(timezone.utc),
     )
     db.add(audit)
