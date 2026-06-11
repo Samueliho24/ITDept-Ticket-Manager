@@ -6,7 +6,7 @@ from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import verify_password, create_access_token
 from BackEnd.app.models.users import Users
 from BackEnd.app.models.audit_log import AuditLog
-from BackEnd.app.schemas.auth import LoginRequest, TokenResponse
+from BackEnd.app.schemas.auth import LoginRequest
 
 def authenticate_user(db: Session, username: str, password: str) -> Users:
     user = db.query(Users).filter(Users.username == username).first()
@@ -40,7 +40,7 @@ def register_login_audit(db: Session, user: Users):
     db.add(audit)
     db.commit()
 
-def login_service(db: Session, login_data: LoginRequest) -> TokenResponse:
+def login_service(db: Session, login_data: LoginRequest) -> tuple[Users, str]:
     user = authenticate_user(db, login_data.username, login_data.password)
     token_payload = {
         "sub": user.id,
@@ -50,4 +50,4 @@ def login_service(db: Session, login_data: LoginRequest) -> TokenResponse:
     }
     access_token = create_access_token(data=token_payload)
     register_login_audit(db, user)
-    return TokenResponse(access_token=access_token)
+    return user, access_token

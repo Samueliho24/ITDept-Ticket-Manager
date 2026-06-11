@@ -42,7 +42,7 @@ class TicketResponse(BaseModel):
     priority: str
     status: str
     category: Optional[str] = None
-    requester_id: str
+    requester_id: Optional[str] = None
     assigned_technician_id: Optional[str] = None
     equipment_id: Optional[str] = None
     department_id: Optional[str] = None

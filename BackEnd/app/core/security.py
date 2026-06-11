@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from jwt import PyJWTError as JWTError
@@ -15,21 +15,30 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET", "fallback-secret-key-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+SESSION_MAX_HOURS = int(os.getenv("SESSION_MAX_HOURS", "8"))
 
 security_scheme = HTTPBearer(auto_error=False)
+
+COOKIE_NAME = "access_token"
+
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
+    if "session_start" not in to_encode:
+        to_encode["session_start"] = datetime.now(timezone.utc).isoformat()
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def decode_token(token: str) -> dict:
     try:
@@ -42,23 +51,68 @@ def decode_token(token: str) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+
+def set_auth_cookie(response: Response, token: str):
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/",
+    )
+
+
+def clear_auth_cookie(response: Response):
+    response.delete_cookie(
+        key=COOKIE_NAME,
+        path="/",
+        httponly=True,
+        samesite="lax",
+        secure=False,
+    )
+
+
+def _extract_token(request: Request, credentials: Optional[HTTPAuthorizationCredentials]) -> str | None:
+    token = request.cookies.get(COOKIE_NAME)
+    if token:
+        return token
+    if credentials:
+        return credentials.credentials
+    return None
+
+
 def get_current_user(
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme),
     db: Session = Depends(getDb),
 ) -> Users:
-    if credentials is None:
+    token = _extract_token(request, credentials)
+    if token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Autenticación requerida.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    payload = decode_token(credentials.credentials)
+    payload = decode_token(token)
     user_id = payload.get("sub")
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido: falta identificador de usuario.",
         )
+    session_start_str = payload.get("session_start")
+    if session_start_str:
+        try:
+            session_start = datetime.fromisoformat(session_start_str)
+            if datetime.now(timezone.utc) - session_start > timedelta(hours=SESSION_MAX_HOURS):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Sesión expirada. Inicie sesión nuevamente.",
+                )
+        except ValueError:
+            pass
     user = db.query(Users).filter(Users.id == user_id).first()
     if user is None:
         raise HTTPException(
