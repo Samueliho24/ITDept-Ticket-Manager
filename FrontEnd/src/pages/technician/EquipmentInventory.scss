@@ -1,0 +1,58 @@
+@use '../../styles/abstracts/variables' as v;
+
+.equipment-inventory {
+  .inventory-filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+
+    .filter-search {
+      min-width: 240px;
+
+      @media (max-width: v.$breakpoint-mobile) {
+        min-width: 100%;
+      }
+    }
+
+    .filter-select {
+      min-width: 160px;
+    }
+  }
+
+  .equip-inv-table {
+    .equip-row-eye {
+      cursor: pointer;
+      color: v.$color-primary;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: v.$color-accent;
+      }
+    }
+  }
+
+  .equip-action-trigger {
+    color: v.$color-text-light;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: v.$color-accent;
+    }
+  }
+
+  .filter-flex-min-200 {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-width-160 {
+    width: 160px;
+  }
+
+  .equip-status-tag {
+    font-weight: 500;
+    font-size: 13px;
+  }
+}

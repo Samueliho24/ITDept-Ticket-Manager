@@ -1,0 +1,29 @@
+@use '../../styles/abstracts/variables' as v;
+
+.requestor-dashboard {
+  .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: v.$color-text;
+      margin: 0;
+    }
+  }
+
+  .loading-center {
+    display: flex;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  .btn-cancel-ticket {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}

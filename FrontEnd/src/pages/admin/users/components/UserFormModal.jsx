@@ -57,7 +57,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
       width={520}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
           <Button type="primary" loading={submitting} onClick={handleSubmit}>
             {isEditing ? 'Guardar' : 'Registrar'}
@@ -66,13 +66,13 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
       }
     >
       <Form form={form} layout="vertical" preserve={false} requiredMark={false}>
-        <div style={{ marginBottom: 24 }}>
-          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+        <div className="mb-24">
+          <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="name"
               label="Nombre"
               rules={[{ required: true, message: 'Campo requerido' }]}
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.name}
             >
               <Input />
@@ -81,7 +81,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
               name="lastname"
               label="Apellido"
               rules={[{ required: true, message: 'Campo requerido' }]}
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.lastname}
             >
               <Input />
@@ -89,8 +89,8 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
           </Space>
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+        <div className="mb-24">
+          <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="username"
               label="Usuario"
@@ -98,7 +98,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
                 { required: true, message: 'Campo requerido' },
                 { min: 3, message: 'Mínimo 3 caracteres' },
               ]}
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.username}
             >
               <Input disabled={isEditing} />
@@ -106,7 +106,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
             <Form.Item
               name="phone"
               label="Teléfono"
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.phone}
             >
               <Input placeholder="Ej: +58 412-1234567" />
@@ -115,8 +115,8 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
         </div>
 
         {!isEditing && (
-          <div style={{ marginBottom: 24 }}>
-            <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+          <div className="mb-24">
+            <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
               <Form.Item
                 name="password"
                 label="Contraseña"
@@ -124,7 +124,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
                   { required: true, message: 'Campo requerido' },
                   { min: 6, message: 'Mínimo 6 caracteres' },
                 ]}
-                style={{ marginBottom: 0 }}
+                className="mb-0"
               >
                 <Input.Password />
               </Form.Item>
@@ -141,7 +141,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
                     },
                   }),
                 ]}
-                style={{ marginBottom: 0 }}
+                className="mb-0"
               >
                 <Input.Password />
               </Form.Item>
@@ -149,13 +149,13 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
           </div>
         )}
 
-        <div style={{ marginBottom: 0 }}>
-          <Space style={{ width: '100%' }} size="middle" styles={{ item: { flex: 1 } }}>
+        <div className="mb-0">
+          <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="role"
               label="Rol"
               rules={[{ required: true, message: 'Campo requerido' }]}
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.role}
             >
               <Select options={rolTypeList} />
@@ -163,7 +163,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
             <Form.Item
               name="department_id"
               label="Departamento"
-              style={{ marginBottom: 0 }}
+              className="mb-0"
               initialValue={user?.department_id || undefined}
             >
               <Select

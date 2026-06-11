@@ -1,3 +1,4 @@
+import './HelpSupport.scss';
 import { Tag } from 'antd';
 import {
   FileText, Clock, XCircle, Star,
@@ -154,7 +155,7 @@ export default function HelpSupport() {
   return (
     <div className="help-support-page">
       <div className="help-header">
-        <h2 className="page-title" style={{ marginBottom: 4 }}>AYUDA Y SOPORTE</h2>
+        <h2 className="page-title">AYUDA Y SOPORTE</h2>
         <div className="help-subtitle-row">
           <p className="help-subtitle">Centro de ayuda del sistema de gestión de tickets.</p>
           <Tag color="blue" className="help-role-badge">{roleLabel}</Tag>

@@ -1,3 +1,4 @@
+import './PublicReport.scss';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Form, Input, Select, Button, Alert, Modal, Typography } from 'antd';
@@ -63,7 +64,7 @@ export default function PublicReport() {
             message={error}
             type="error"
             showIcon
-            style={{ marginBottom: 16 }}
+            className="mb-16"
             closable
             onClose={() => setError(null)}
           />
@@ -131,7 +132,7 @@ export default function PublicReport() {
           </Form.Item>
         </Form>
 
-        <div style={{ textAlign: 'center', marginTop: 8 }}>
+        <div className="text-center mt-8">
           <Button
             type="link"
             icon={<LoginOutlined />}
@@ -155,20 +156,20 @@ export default function PublicReport() {
           </Button>,
         ]}
       >
-        <div style={{ textAlign: 'center', padding: '16px 0' }}>
-          <Text strong style={{ fontSize: 18, display: 'block', marginBottom: 8 }}>
+        <div className="public-success-body">
+          <Text strong className="public-success-title">
             ¡Reporte recibido!
           </Text>
-          <Text style={{ display: 'block', marginBottom: 16 }}>
+          <Text className="public-success-label">
             Su número de ticket es:
           </Text>
-          <Text strong style={{ fontSize: 24, color: '#006699', display: 'block', marginBottom: 16 }}>
+          <Text strong className="public-success-number">
             {ticketNumber}
           </Text>
-          <Text style={{ display: 'block', color: '#64748B' }}>
+          <Text className="public-success-hint">
             Guarde este número para dar seguimiento a su reporte.
           </Text>
-          <Text style={{ display: 'block', color: '#64748B', marginTop: 12 }}>
+          <Text className="public-success-hint mt-12">
             Si desea recibir notificaciones y ver el historial completo de sus tickets,
             contacte al departamento de TIC para que le creen un usuario.
           </Text>

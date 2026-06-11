@@ -1,0 +1,43 @@
+@use '../../styles/abstracts/variables' as v;
+
+.technician-history {
+  .history-filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .history-filter-status {
+    flex: 1;
+    max-width: 300px;
+    min-width: 180px;
+  }
+
+  .history-filter-date {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+.requestor-history {
+  .history-filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .history-filter-status {
+    flex: 1;
+    max-width: 300px;
+    min-width: 180px;
+  }
+
+  .history-filter-date {
+    flex: 1;
+    min-width: 200px;
+  }
+}

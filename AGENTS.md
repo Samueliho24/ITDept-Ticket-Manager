@@ -8,7 +8,7 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 ## State — fully implemented modules
 
 ### Backend
-- **8 models**: Users, Departments, Equipment, Tickets, TicketHistory, TicketRating, NotificationRead, AuditLog
+- **9 models**: Users, Departments, Equipment, Tickets, TicketHistory, TicketRating, NotificationRead, AuditLog, Categories
 - **Auth module done**: JWT login (HS256, bcrypt), RBAC dependencies (`get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles`, `RoleChecker`). Endpoint: `POST /api/v1/auth/login`
 - **Equipment module done**: Full CRUD with RBAC (`RoleChecker`), transfer location, change status, decommission, paginated listing with filters (search, type, status), automatic `AuditLog` per mutation. Endpoints: `/api/v1/equipments/`
 - **Tickets module done**: Full lifecycle (create, list, detail, assign, status change, resolve, cancel, rate, history). Automatic `TicketHistory` + `AuditLog` per mutation. Endpoints: `/api/v1/tickets/`
@@ -16,16 +16,18 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 - **Departments module done**: Admin CRUD (create, update, delete with validation, list, detail). Automatic `AuditLog`. Endpoints: `/api/v1/departments/`
 - **Notifications module done**: List user notifications (paginated), mark as read, stale alerts. Endpoints: `/api/v1/notifications/`
 - **Audit logs module done**: Read-only paginated viewer with date range, user search, action filter. Endpoint: `GET /api/v1/admin/audit-logs`
-- **`samples/`** contains an older invoice system that is NOT the current target. Do NOT build on `samples/`.
+- **Categories module done**: CRUD de categorías de tickets con auditoría. Endpoints: `/api/v1/categories/`
+- **Metrics module done**: KPIs, estadísticas del dashboard, tendencias. Endpoint: `GET /api/v1/metrics/`
+- **Public module done**: Reporte público de tickets (sin autenticación). Endpoints: `/api/v1/public/`
 
 ### Frontend — 3 complete role-based modules
 - **Requestor**: Dashboard (report ticket modal + last tickets), History, Help
 - **Technician**: Dashboard (KPI cards + dynamic list), EquipmentInventory (read-only), Workspace, History (assigned), Help
 - **Admin**: Dashboard (Technician view), EquipmentInventory (full CRUD + transfer + decommission), TicketAssignment, UserManagement (CRUD + status toggle + password change), AuditLog (read-only filtered), Settings (department CRUD), History (global), Help
 - **Common**: Login, HelpSupport, ProtectedRoute with RBAC
-- **8 services**: api (axios with JWT interceptor), authService, ticketService, equipmentService, userService, departmentService, auditService, notificationService
+- **11 services**: api, authService, ticketService, equipmentService, userService, departmentService, auditService, notificationService, categoryService, metricsService, publicService
 - **3 contexts**: AuthContext (login/logout/session), AppContext (Ant Design message/notification), ModalContext
-- **Styles**: Single `stylesPages.scss` with BEM-like nesting, Ant Design `ConfigProvider` theming (`#006699` primary, `#660099` accent)
+- **Styles**: Modular `styles/` directory (`global.scss`, `_variables.scss`, `_reset.scss`, `_antd-overrides.scss`, `_shared.scss`) + Ant Design `ConfigProvider` theming (`#006699` primary, `#660099` accent)
 
 ### Other
 - **No tests** yet.
@@ -35,9 +37,9 @@ Backend: FastAPI + SQLAlchemy 2.0 + MariaDB/MySQL. Frontend: React 19 + Vite 8 +
 
 - All entity IDs are **UUIDv4** — enforced in SQLAlchemy models via `default=lambda: str(uuid.uuid4())`.
 - API prefix must be `/api/v1/` (used by all routers).
-- Python package name is `BackEnd` (uppercase E) — a **symlink** at repo root points `BackEnd` → `Backend`.
+- Python package name is `BackEnd` (uppercase E) — `BackEnd` y `Backend` son el mismo directorio (Windows FS case-insensitive).
 - DB driver is **pymysql** (pure Python, works with MariaDB/MySQL).
-- Passwords hashed with **bcrypt** via `passlib` (`hash_password` / `verify_password` in `core/security.py`).
+- Passwords hashed with **bcrypt** via `passlib[bcrypt]` (`hash_password` / `verify_password` in `core/security.py`).
 - Every write endpoint (POST/PUT/PATCH/DELETE) must log to `AuditLog` (table `audit_logs`).
 - Reusable auth dependencies in `BackEnd/app/core/security.py`: `get_current_user`, `get_current_active_user`, `get_current_admin`, `require_roles([...])`, `RoleChecker`.
 - RBAC cascade: `admin` inherits `technician` which inherits `requestor`. Use `RoleChecker(["admin"])`, `RoleChecker(["admin","technician"])`, or `RoleChecker(["admin","technician","requestor"])`.
@@ -57,7 +59,7 @@ npm run preview   # Preview production build
 ```
 
 - Backend `.env` sets `PORT=3006` but `uvicorn` needs `--port` explicitly.
-- Run from project root (not `Backend/`) so the `BackEnd` symlink resolves correctly.
+- Run from project root (`BackEnd/app/main.py`).
 
 ## Project structure
 
@@ -81,6 +83,7 @@ Backend/
       ticket_ratings.py  # TicketRating (ticket_id, user_id, rating 1-5, comment)
       notification_reads.py # NotificationRead (user_id, ticket_id, message, read_at)
       audit_log.py      # AuditLog (user_id, action, affected_table, record_id, details JSON)
+      categories.py     # Categories (name, description, is_active)
     routers/
       auth.py           # POST /api/v1/auth/login
       users.py          # 6 endpoints: CRUD + status toggle + password change
@@ -89,6 +92,9 @@ Backend/
       department.py     # 5 endpoints: create, update, delete (with validation), list, detail
       audit.py          # 1 endpoint: GET list (paginated+filtered)
       notifications.py  # 3 endpoints: list (paginated), mark read, stale alerts
+      categories.py     # CRUD de categorías de tickets
+      metrics.py        # KPIs y estadísticas del dashboard
+      public.py         # Reporte público de tickets (sin autenticación)
     schemas/
       auth.py           # LoginRequest, TokenResponse, TokenData
       user.py           # UserCreate/Update/StatusToggle/PasswordChange/Response
@@ -100,6 +106,9 @@ Backend/
       notification.py   # NotificationResponse/Paginated
       audit_log.py      # AuditLogResponse (includes user_full_name, user_username)
       pagination.py     # EquipmentPaginated, TicketPaginated, UserPaginated, DepartmentPaginated, AuditLogPaginated
+      category.py       # CategoryCreate/Update/Response
+      metrics.py        # KPIs, TechnicianStats, TicketTrend
+      public_ticket.py  # PublicTicketCreate/Response
     services/
       auth_service.py       # authenticate_user, login_service + audit log
       user_service.py       # Full user CRUD + audit
@@ -108,7 +117,9 @@ Backend/
       department_service.py # Full department CRUD + audit
       audit_log_service.py  # Paginated read-only queries with filters
       notification_service.py # List/mark read/stale alerts
-  samples/              # OLD invoice system — do not build on this
+      category_service.py     # CRUD categorías + audit
+      metrics_service.py      # KPIs, estadísticas del dashboard
+      public_ticket_service.py # Reporte público de tickets
   .env                  # DB credentials + SECRET (gitignored)
   venv/                 # Python venv
 
@@ -116,7 +127,7 @@ Frontend/
   src/
     main.jsx            # Entry point (BrowserRouter, ConfigProvider theme, AuthProvider, AppProvider)
     App.jsx             # Root component — renders AppRoutes
-    stylesPages.scss    # Global styles (BEM nesting, Ant Design overrides)
+    styles/             # Modular SCSS (global.scss, _variables.scss, _reset.scss, _antd-overrides.scss, _shared.scss)
     constants/
       lists.js          # Enums for status, priority, category, equipment types
       specsConfig.js    # JSON specs config per equipment type
@@ -124,6 +135,12 @@ Frontend/
       AuthContext.jsx   # Login/logout, JWT decode, session persistence
       AppContext.jsx    # Ant Design message/notification API
       ModalContext.jsx  # Global modal state management
+    hooks/
+      useDashboardMetrics.js  # Custom hook for dashboard data
+    components/
+      ChartsSection.jsx, KpiCard.jsx, KpiRow.jsx, MetricsHeader.jsx
+      ResolvedBarChart.jsx, DepartmentDonutChart.jsx
+      TicketListView.jsx
     layout/
       MainLayout.jsx   # Sidebar + Header + Outlet
       Sidebar.jsx      # Role-based nav sections (lucide-react icons)
@@ -135,11 +152,16 @@ Frontend/
       common/
         Login.jsx       # Login form
         HelpSupport.jsx # FAQ and system info
+      public/
+        PublicReport.jsx      # Reporte público (sin auth)
+        PublicTicketView.jsx   # Consulta pública de ticket
       requestor/
         Dashboard.jsx    # Report button + last tickets
         History.jsx      # Own tickets full history
         modals/
           TicketDetailModal.jsx
+          ReportTicketModal.jsx
+          CancelTicketModal.jsx
       technician/
         Dashboard.jsx    # KPI cards + dynamic table
         EquipmentInventory.jsx # Read-only equipment view
@@ -150,10 +172,15 @@ Frontend/
           InfoHistoryModal.jsx
           ResolveTicketModal.jsx
       admin/
-        UserManagement.jsx    # CRUD users
-        AuditLog.jsx          # Read-only audit viewer
-        Settings.jsx          # Department CRUD
+        Dashboard.jsx         # Technician-style dashboard for admin
         TicketAssignment.jsx  # Assign tickets to technicians
+        AuditLog.jsx          # Read-only audit viewer
+        users/
+          UserManagement.jsx  # CRUD users
+          components/         # UserFormModal, UserDeleteModal, UserStatusModal, UserPasswordModal
+        settings/
+          Settings.jsx        # Department & Category CRUD
+          components/         # DepartmentFormModal, CategoryFormModal, DepartmentDeleteModal, CategoryDeleteModal, DepartmentStatusModal, CategoryStatusModal
         modals/
           AddAssetModal.jsx
           EditAssetModal.jsx
@@ -161,38 +188,30 @@ Frontend/
           DecommissionAssetModal.jsx
     services/
       api.js                # Axios instance (baseURL, JWT interceptor, 401 redirect)
-      authService.js        # loginService
+      authService.js        # loginService, authMeService, refreshTokenService, logoutService
       ticketService.js      # All ticket API calls
       equipmentService.js   # All equipment API calls
       userService.js        # All user API calls
       departmentService.js  # All department API calls
       auditService.js       # Audit log API calls
       notificationService.js # Notification API calls
+      categoryService.js    # Category CRUD API calls
+      metricsService.js     # Dashboard KPIs & metrics API calls
+      publicService.js      # Public ticket report API calls
   vite.config.js            # Vite + React plugin
   package.json              # antd, axios, lucide-react, react-router-dom, sass, vite
 
-BackEnd -> Backend      # Symlink for package name
+BackEnd/               # Mismo directorio que Backend (Windows case-insensitive)
 ```
 
 ## Dependencies
 
-- **Backend** (installed in `Backend/venv/`): `fastapi`, `uvicorn`, `sqlalchemy`, `pydantic`, `python-dotenv`, `pymysql`, `passlib[bcrypt]`, `pyjwt`, `multipart`, `annotated-types`. No `requirements.txt` — manage via `pip freeze > requirements.txt`.
+- **Backend** (installed in `Backend/venv/`): `fastapi`, `uvicorn`, `sqlalchemy`, `pydantic`, `python-dotenv`, `pymysql`, `passlib[bcrypt]`, `pyjwt`, `multipart`, `annotated-types`. Defined in `requirements.txt` (dev extras: `pytest`, `httpx`).
 - **Frontend** (from `package.json`): `react`, `react-dom`, `antd`, `axios`, `lucide-react`, `react-router-dom`, `sass`. Dev: `vite`, `@vitejs/plugin-react`, `eslint`.
 
-## Reference docs
+## Reference docs (consolidated)
 
-- `Docs/context/Context_Master.md` — Master AI context (architecture, RBAC matrix, security rules).
-- `Docs/context/CONTEXT_AUTH_JWT.md` — Auth module spec (JWT payload, expiry, algorithm).
-- `Docs/context/Contexto_Proyecto_Tickets_TIC_LUZ_V4.md` — Detailed functional/non-functional requirements, use cases.
-- `Docs/context/CONTEXT_EQUIPMENT_TICKETS.md` — Equipment/Tickets module spec (RBAC cascade, endpoints, audit rules).
-- `Docs/context/CONTEXT_ADMIN_MANAGEMENT.md` — User & department admin CRUD spec.
-- `Docs/context/CONTEXT_AUDIT_LOGS_VISUALIZATION.MD` — Audit log viewer spec.
-- `Docs/context/CONTEXT_PAGINATION.md` — Global pagination standard.
-- `Docs/context/REFACTOR_NOTES_PHASE2.md` — Phase 2 refactoring notes (Ant Design migration).
-- `Docs/api/API_CONTRACT_FRONTEND.md` — Full API contract for frontend consumption.
-- `Docs/frontend/FRONTEND_CONTEXT_BASE.md` — Frontend architecture, design system, styling rules.
-- `Docs/frontend/UI_DESIGN_SYSTEM.md` — Visual identity manual (colors, layout, components).
-- `Docs/frontend/Frontend_Development_plan.md` — Incremental development plan.
-- `Docs/frontend/ESPECIFICACIONES_INVENTARIO_TIC.md` — Equipment specs per type.
-- `Docs/Roles_Permisos.md` — RBAC role definitions and menu items.
-- `Docs/tic_luz_tickets.sql` — Database schema SQL.
+- `Docs/CONTEXT.md` — Master system documentation (architecture, RBAC, business rules, JWT auth, pagination, frontend architecture, design system, DB schema).
+- `Docs/API.md` — Full API contract for frontend-backend communication (all endpoints, request/response schemas, error codes).
+- `Docs/ESPECIFICACIONES_INVENTARIO_TIC.md` — Equipment specs per type (JSON schema for technical_specifications field).
+- `Docs/tic_luz_tickets.sql` — Database schema SQL (MariaDB).

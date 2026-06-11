@@ -1,3 +1,4 @@
+import './History.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Select, DatePicker, Space, Tag } from 'antd';
 import { listTickets } from '../../services/ticketService';
@@ -102,7 +103,7 @@ export default function RequestorHistory() {
         <Space>
           <a onClick={() => openDetail(record)}>Ver</a>
           {(record.status === 'Abierto') && (
-            <a onClick={() => openCancel(record)} style={{ color: '#860404' }}>Anular</a>
+            <a onClick={() => openCancel(record)} className="history-cancel-link">Anular</a>
           )}
         </Space>
       ),
@@ -116,13 +117,13 @@ export default function RequestorHistory() {
         <Select
           allowClear
           placeholder="Filtrar por estado"
-          style={{ flex: 1, maxWidth: 300, minWidth: 180 }}
+          className="history-filter-status"
           value={statusFilter}
           onChange={(val) => { setStatusFilter(val); setPage(1); }}
           options={ticketStatusList}
         />
         <RangePicker
-          style={{ flex: 1, minWidth: 200 }}
+          className="history-filter-date"
           onChange={(dates) => { setDateRange(dates); setPage(1); }}
         />
       </div>

@@ -1,3 +1,4 @@
+import './InfoHistoryModal.scss';
 import { Modal } from 'antd';
 import { Info } from 'lucide-react';
 

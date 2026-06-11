@@ -1,0 +1,7 @@
+@use '../styles/abstracts/variables' as v;
+
+.ticket-list-badge {
+  .ant-badge-count {
+    background-color: v.$color-primary;
+  }
+}

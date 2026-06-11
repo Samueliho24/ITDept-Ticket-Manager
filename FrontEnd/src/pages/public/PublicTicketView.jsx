@@ -1,3 +1,4 @@
+import './PublicTicketView.scss';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, Descriptions, Tag, Typography, Alert, Spin } from 'antd';
@@ -80,17 +81,17 @@ export default function PublicTicketView() {
         </Form>
 
         {error && (
-          <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} closable onClose={() => setError(null)} />
+          <Alert message={error} type="error" showIcon className="mb-16" closable onClose={() => setError(null)} />
         )}
 
         {loading && (
-          <div style={{ textAlign: 'center', padding: 24 }}>
+          <div className="public-loading-center">
             <Spin />
           </div>
         )}
 
         {ticket && !loading && (
-          <Card size="small" style={{ marginTop: 16 }}>
+          <Card size="small" className="public-result-card">
             <Descriptions column={1} size="small" bordered>
               <Descriptions.Item label="Ticket N°">
                 <Text strong>{ticket.ticket_number}</Text>
@@ -116,12 +117,12 @@ export default function PublicTicketView() {
           </Card>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: 16 }}>
+        <div className="public-nav-row">
           <Button
             type="link"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate('/reportar')}
-            style={{ marginRight: 16 }}
+            className="mr-16"
           >
             Nuevo reporte
           </Button>

@@ -1,3 +1,4 @@
+import './Login.scss';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Alert, Modal } from 'antd';
@@ -41,7 +42,7 @@ export default function Login() {
             message={error}
             type="error"
             showIcon
-            style={{ marginBottom: 24 }}
+            className="mb-24"
             closable
             onClose={() => setError(null)}
           />
@@ -89,7 +90,7 @@ export default function Login() {
             </Button>
           </Form.Item>
 
-          <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
+          <Form.Item className="text-center mb-0">
             <Button type="link" onClick={() => setForgotModalOpen(true)}>
               ¿Olvidó su usuario o contraseña?
             </Button>
@@ -112,7 +113,7 @@ export default function Login() {
           Para restablecer su usuario o contraseña, comuníquese al Departamento de Tecnología,
           Información y Comunicación de la Facultad de Odontología a través del correo electrónico:
         </p>
-        <p style={{ fontWeight: 600, textAlign: 'center', fontSize: 16, marginTop: 12 }}>
+        <p className="forgot-email">
           <a href="mailto:dptotic.facoluz@gmail.com" target="_blank" rel="noopener noreferrer">dptotic.facoluz@gmail.com</a>
         </p>
       </Modal>

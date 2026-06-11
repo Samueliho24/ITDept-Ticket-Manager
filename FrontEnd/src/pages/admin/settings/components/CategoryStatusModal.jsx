@@ -37,7 +37,7 @@ export default function CategoryStatusModal({ open, onClose, onSuccess, category
       width={480}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
           <Button type="primary" loading={submitting} onClick={handleConfirm}>
             Confirmar

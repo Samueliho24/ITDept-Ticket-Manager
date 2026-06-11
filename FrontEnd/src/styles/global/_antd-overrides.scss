@@ -1,0 +1,24 @@
+@use '../abstracts/variables' as v;
+
+.ant-btn-primary {
+  box-shadow: none;
+}
+
+.ant-input:hover,
+.ant-input:focus,
+.ant-input-focused {
+  border-color: v.$color-accent !important;
+  box-shadow: 0 0 0 2px rgba(v.$color-accent, 0.1) !important;
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  background-color: #005580 !important;
+}
+
+a {
+  color: v.$color-primary;
+
+  &:hover {
+    color: v.$color-accent;
+  }
+}

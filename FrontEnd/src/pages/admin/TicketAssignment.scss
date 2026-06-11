@@ -1,0 +1,49 @@
+@use '../../styles/abstracts/variables' as v;
+
+.ticket-assignment-page {
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (max-width: v.$breakpoint-mobile) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .assignment-card {
+    background: v.$color-card-bg;
+    border-radius: v.$border-radius-card;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: v.$color-text;
+      margin-bottom: 16px;
+    }
+  }
+
+  .ta-date-block {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .ta-avatar {
+    background-color: #006699;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .ta-tech-name {
+    font-size: 13px;
+  }
+
+  .ta-admin-tag {
+    font-size: 10px;
+    line-height: 16px;
+    padding: 0 4px;
+  }
+}

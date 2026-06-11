@@ -1,0 +1,42 @@
+@use '../../styles/abstracts/variables' as v;
+
+.admin-audit-page {
+  .audit-filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .audit-filter-flex {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .audit-filter-max-300 {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .audit-filter-medium {
+    flex: 1;
+    max-width: 220px;
+    min-width: 160px;
+  }
+
+  .admin-audit-table {
+    .ant-table-thead > tr > th {
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      color: v.$color-text-light;
+      background-color: v.$color-card-bg;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background-color: v.$color-table-hover;
+    }
+  }
+}

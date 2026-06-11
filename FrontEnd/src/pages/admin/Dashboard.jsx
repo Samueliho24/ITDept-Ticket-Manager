@@ -1,3 +1,4 @@
+import './Dashboard.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import MetricsHeader from '../../components/MetricsHeader';
 import KpiRow from '../../components/KpiRow';

@@ -1,0 +1,32 @@
+@use '../../../styles/abstracts/variables' as v;
+
+.info-history-modal {
+  display: flex;
+  justify-content: center;
+
+  .info-modal-card {
+    background-color: #E5E9EB;
+    border-radius: v.$border-radius-card;
+    padding: 32px;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .info-modal-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: #7B1FA2;
+  }
+
+  .info-modal-text {
+    font-size: 14px;
+    color: v.$color-text;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .info-modal-btn {
+    min-width: 120px;
+  }
+}

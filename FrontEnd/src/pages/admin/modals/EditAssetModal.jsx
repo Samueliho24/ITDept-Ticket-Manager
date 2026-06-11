@@ -69,7 +69,7 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
     const name = `spec_${field.key}`;
     if (field.type === 'select') {
       return (
-        <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
+        <Form.Item key={field.key} name={name} label={field.label} className="flex-1">
           <Select placeholder={`Seleccionar ${field.label.toLowerCase()}`} allowClear>
             {field.options.map((opt) => (
               <Select.Option key={opt} value={opt}>{opt}</Select.Option>
@@ -80,20 +80,20 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
     }
     if (field.type === 'number') {
       return (
-        <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
-          <InputNumber placeholder={field.label} style={{ width: '100%' }} />
+        <Form.Item key={field.key} name={name} label={field.label} className="flex-1">
+          <InputNumber placeholder={field.label} className="w-100" />
         </Form.Item>
       );
     }
     if (field.type === 'textarea') {
       return (
-        <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
+        <Form.Item key={field.key} name={name} label={field.label} className="flex-1">
           <TextArea rows={3} placeholder={field.label} />
         </Form.Item>
       );
     }
     return (
-      <Form.Item key={field.key} name={name} label={field.label} style={{ flex: 1 }}>
+      <Form.Item key={field.key} name={name} label={field.label} className="flex-1">
         <Input placeholder={field.label} />
       </Form.Item>
     );
@@ -107,39 +107,39 @@ export default function EditAssetModal({ open, onClose, onSuccess, departments, 
       width={640}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
           <Button type="primary" loading={submitting} onClick={handleSubmit}>Guardar Cambios</Button>
         </Space>
       }
     >
       <Form form={form} layout="vertical" preserve={false}>
-        <Space style={{ width: '100%' }} size="middle">
-          <Form.Item label="Código de Inventario" style={{ flex: 1 }}>
+        <Space className="w-100" size="middle">
+          <Form.Item label="Código de Inventario" className="flex-1">
             <Input value={equipment?.inventory_code || ''} disabled />
           </Form.Item>
-          <Form.Item name="equipment_type" label="Tipo de Activo" rules={[{ required: true, message: 'Campo requerido' }]} style={{ flex: 1 }}>
+          <Form.Item name="equipment_type" label="Tipo de Activo" rules={[{ required: true, message: 'Campo requerido' }]} className="flex-1">
             <Select options={equipmentTypeList} onChange={handleTypeChange} />
           </Form.Item>
         </Space>
 
-        <Space style={{ width: '100%' }} size="middle">
-          <Form.Item name="brand" label="Marca" style={{ flex: 1 }}>
+        <Space className="w-100" size="middle">
+          <Form.Item name="brand" label="Marca" className="flex-1">
             <Input />
           </Form.Item>
-          <Form.Item name="model" label="Modelo" style={{ flex: 1 }}>
+          <Form.Item name="model" label="Modelo" className="flex-1">
             <Input />
           </Form.Item>
-          <Form.Item name="serial" label="N. Serie (Opcional)" style={{ flex: 1 }}>
+          <Form.Item name="serial" label="N. Serie (Opcional)" className="flex-1">
             <Input placeholder="Ej: SN-12345678" />
           </Form.Item>
         </Space>
 
-        <Space style={{ width: '100%' }} size="middle">
-          <Form.Item name="assigned_person" label="Persona Asignada (Opcional)" style={{ flex: 1 }}>
+        <Space className="w-100" size="middle">
+          <Form.Item name="assigned_person" label="Persona Asignada (Opcional)" className="flex-1">
             <Input />
           </Form.Item>
-          <Form.Item name="department_id" label="Ubicación / Departamento" style={{ flex: 1 }}>
+          <Form.Item name="department_id" label="Ubicación / Departamento" className="flex-1">
             <Select
               allowClear
               placeholder="Seleccionar departamento"

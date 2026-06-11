@@ -1,3 +1,4 @@
+import './Sidebar.scss';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Drawer, Modal } from 'antd';
 import { LogOut } from 'lucide-react';

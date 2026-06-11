@@ -1,0 +1,78 @@
+@use '../../styles/abstracts/variables' as v;
+
+.technician-dashboard {
+  position: relative;
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+
+    @media (max-width: v.$breakpoint-mobile) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .kpi-card {
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+    color: #fff;
+    border: 2px solid transparent;
+
+    &:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    &.active {
+      border-color: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4), 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .kpi-text {
+      .kpi-value {
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.3px;
+      }
+
+      .kpi-label {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.2;
+        opacity: 0.85;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+      }
+    }
+
+    .kpi-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  }
+
+  .tech-dashboard-info-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .tech-dashboard-divider {
+    border: none;
+    border-top: 1px solid v.$color-header-border;
+    margin: 24px 0;
+  }
+}

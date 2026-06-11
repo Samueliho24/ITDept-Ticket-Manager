@@ -1,3 +1,4 @@
+import './Workspace.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Input, Select, Button, Spin, Tag, message, Divider } from 'antd';
@@ -144,7 +145,7 @@ export default function Workspace() {
               onChange={(e) => handleEquipSearch(e.target.value)}
               className="equip-search-input"
             />
-            {equipSearching && <Spin size="small" style={{ marginTop: 8 }} />}
+            {equipSearching && <Spin size="small" className="mt-8" />}
             {equipmentResults.length > 0 && (
               <div className="equip-search-results">
                 {equipmentResults.map((eq) => (
@@ -161,7 +162,7 @@ export default function Workspace() {
               </div>
             )}
             {selectedEquipment && !equipmentSearch && (
-              <Tag closable onClose={() => setSelectedEquipment(null)} style={{ marginTop: 8 }}>
+              <Tag closable onClose={() => setSelectedEquipment(null)} className="mt-8">
                 Equipo asociado
               </Tag>
             )}
@@ -173,7 +174,7 @@ export default function Workspace() {
             <h4>Categoría de Soporte</h4>
             <Select
               placeholder="Seleccione una categoría"
-              style={{ width: '100%' }}
+              className="w-100"
               value={category}
               onChange={handleCategoryChange}
               options={categoryOptions}
@@ -188,7 +189,7 @@ export default function Workspace() {
             <h4>Estado del Soporte</h4>
             <Select
               placeholder="Cambiar estado"
-              style={{ width: '100%' }}
+              className="w-100"
               value={ticketStatus}
               onChange={handleStatusChange}
               options={[

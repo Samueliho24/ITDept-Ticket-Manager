@@ -1,3 +1,4 @@
+import './ChartsSection.scss';
 import { Switch } from 'antd';
 import ResolvedBarChart from './ResolvedBarChart';
 import DepartmentDonutChart from './DepartmentDonutChart';
@@ -7,11 +8,11 @@ export default function ChartsSection({ resolvedByMonth, departmentBreakdown, lo
     <div className="charts-grid">
       <ResolvedBarChart data={resolvedByMonth} loading={loading} />
       <div className="chart-card">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <h3 className="chart-card__title" style={{ margin: 0 }}>Áreas con Mayor Recurrencia de Fallas</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+        <div className="chart-header-row">
+          <h3 className="chart-card__title chart-title">Áreas con Mayor Recurrencia de Fallas</h3>
+          <div className="chart-toggle-row">
             <Switch size="small" onChange={(checked) => onToggleCancelled?.(checked)} />
-            <span style={{ color: '#64748B' }}>Excluir anulados</span>
+            <span className="chart-toggle-label">Excluir anulados</span>
           </div>
         </div>
         <DepartmentDonutChart data={departmentBreakdown} loading={loading} />

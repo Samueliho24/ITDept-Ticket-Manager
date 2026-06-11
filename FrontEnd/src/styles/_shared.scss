@@ -1,0 +1,758 @@
+@use 'abstracts/variables' as v;
+
+// ============================================
+// LOGIN PAGE (shared: Login.jsx, PublicReport.jsx, PublicTicketView.jsx)
+// ============================================
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: v.$color-bg;
+  background-image: radial-gradient(ellipse at top, rgba(v.$color-primary, 0.08) 0%, transparent 60%);
+
+  .card {
+    background-color: v.$color-card-bg;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-zone {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-color: v.$color-primary;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: white;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: v.$color-text;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: v.$color-text-light;
+    }
+
+    .form {
+      .ant-form-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .button {
+        width: 100%;
+        height: 40px;
+      }
+    }
+  }
+
+  .login-footer {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 0 16px;
+
+    h4 {
+      font-size: inherit;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    p {
+      margin: 0;
+      opacity: 0.7;
+    }
+  }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    padding: 16px;
+
+    .card {
+      padding: 24px;
+    }
+  }
+}
+
+.login-gradient-bg {
+  background: linear-gradient(135deg, v.$color-primary 0%, v.$color-accent 100%);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+                    linear-gradient(135deg, v.$color-primary 0%, v.$color-accent 100%);
+}
+
+// ============================================
+// KPI CARDS (shared: KpiCard component, dashboards)
+// ============================================
+.metricas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: v.$breakpoint-mobile) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.kpi-card {
+  background-color: v.$color-card-bg;
+  border-radius: v.$border-radius-card;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid transparent;
+  transition: v.$transition-base;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  cursor: default;
+
+  &:hover {
+    border-color: v.$color-primary;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: v.$border-radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.status-success { background-color: rgba(v.$color-success, 0.1); }
+    &.status-warning { background-color: rgba(v.$color-warning, 0.1); }
+    &.status-danger { background-color: rgba(v.$color-danger, 0.1); }
+    &.status-primary { background-color: rgba(v.$color-primary, 0.1); }
+    &.status-accent { background-color: rgba(v.$color-accent, 0.1); }
+  }
+
+  .info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .label {
+    font-size: 13px;
+    color: v.$color-text-light;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: v.$color-text;
+    line-height: 1.2;
+  }
+
+  .trend {
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+// ============================================
+// CUSTOM TABLE STYLES
+// ============================================
+.tickets-custom-table {
+  .ant-table-thead > tr > th {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: v.$color-text-light;
+    background-color: v.$color-card-bg;
+    border-bottom: 2px solid v.$color-header-border;
+    padding: 12px 16px;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 12px 16px;
+    border-bottom: 1px solid v.$color-header-border;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background-color: v.$color-table-hover;
+  }
+
+  .ant-table-tbody > tr.ant-table-row-selected > td {
+    background-color: rgba(v.$color-primary, 0.05);
+  }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    overflow-x: auto;
+
+    .ant-table {
+      min-width: 600px;
+    }
+  }
+}
+
+// ============================================
+// PAGE TITLE BAR
+// ============================================
+.page-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: v.$color-text;
+    margin: 0;
+  }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: v.$color-text;
+  margin-bottom: 20px;
+}
+
+// ============================================
+// CHART CARD CONTAINER
+// ============================================
+.chart-container-card {
+  background-color: v.$color-card-bg;
+  border-radius: v.$border-radius-card;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+}
+
+// ============================================
+// TICKET LIST (shared: TicketListView, requestor Dashboard, technician History)
+// ============================================
+.ticket-list {
+  .ticket-list-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: v.$color-text;
+      margin: 0;
+    }
+  }
+
+  .ticket-list-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: v.$color-text-light;
+    font-size: 14px;
+  }
+}
+
+.ticket-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-row {
+  display: flex;
+  align-items: center;
+  background-color: v.$color-card-bg;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid #E8ECF0;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: v.$color-primary;
+  }
+
+  @media (max-width: v.$breakpoint-tablet) {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+.ticket-col {
+  flex-shrink: 0;
+}
+
+.ticket-col-info {
+  flex: 1 1 34%;
+  min-width: 0;
+  padding-right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .ticket-number {
+    font-size: 16px;
+    font-weight: 700;
+    color: v.$color-primary;
+    letter-spacing: 0.3px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  .ticket-solicitante {
+    font-size: 14px;
+    font-weight: 600;
+    color: v.$color-text;
+    margin-top: 2px;
+  }
+}
+
+.ticket-col-dept {
+  flex: 0 0 16%;
+  display: flex;
+  justify-content: center;
+
+  .ticket-dept-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: v.$color-text-light;
+  }
+}
+
+.ticket-col-cat {
+  flex: 0 0 14%;
+  display: flex;
+  justify-content: center;
+}
+
+.ticket-col-date {
+  flex: 0 0 18%;
+  text-align: center;
+
+  .ticket-date {
+    font-size: 13px;
+    font-weight: 500;
+    color: v.$color-text;
+  }
+
+  .ticket-days {
+    font-size: 14px;
+    font-weight: 600;
+    color: v.$color-text;
+    margin-top: 2px;
+
+    &.stale {
+      color: #B91C1C;
+    }
+  }
+}
+
+.ticket-col-action {
+  flex: 0 0 18%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-atender {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-col-status {
+  flex: 0 0 14%;
+  display: flex;
+  justify-content: center;
+}
+
+// ============================================
+// TICKET DETAIL MODAL (shared: requestor + admin)
+// ============================================
+.ticket-detail-modal {
+  .detail-section {
+    margin-top: 24px;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: v.$color-text;
+    }
+  }
+
+  .ant-descriptions {
+    margin-bottom: 8px;
+  }
+
+  .timeline-item {
+    font-size: 13px;
+    line-height: 1.5;
+
+    .timeline-action {
+      font-weight: 600;
+      color: v.$color-text;
+    }
+
+    .timeline-reason {
+      color: v.$color-text-light;
+      font-style: italic;
+    }
+
+    .timeline-user {
+      display: block;
+      font-size: 11px;
+      color: v.$color-primary;
+    }
+
+    .timeline-date {
+      display: block;
+      font-size: 11px;
+      color: v.$color-text-light;
+    }
+  }
+
+  .rating-section {
+    text-align: center;
+    padding: 16px;
+    background: rgba(v.$color-primary, 0.04);
+    border-radius: v.$border-radius-sm;
+
+    h4 {
+      margin-bottom: 8px;
+    }
+
+    &.rated {
+      background: rgba(v.$color-success, 0.06);
+    }
+  }
+}
+
+// ============================================
+// NOTIFICATION DROPDOWN (shared: Header.jsx)
+// ============================================
+.notification-badge {
+  .ant-badge-count {
+    font-size: 10px;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+.notification-icon {
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #ffffff;
+  }
+}
+
+.notif-popover {
+  .ant-popover-inner {
+    padding: 0;
+    border-radius: v.$border-radius-sm;
+  }
+
+  .notif-dropdown {
+    min-width: 320px;
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .notif-loading {
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+  }
+
+  .notif-item {
+    padding: 12px 16px !important;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid v.$color-header-border;
+
+    &:hover {
+      background: v.$color-table-hover;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.unread {
+      background: rgba(v.$color-primary, 0.03);
+    }
+
+    .notif-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notif-msg {
+      font-size: 13px;
+      color: v.$color-text;
+      margin-bottom: 2px;
+    }
+
+    .notif-date {
+      font-size: 11px;
+      color: v.$color-text-light;
+    }
+
+    .notif-dot {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      border-radius: 50%;
+      background-color: v.$color-primary;
+      margin-left: 8px;
+    }
+  }
+
+  .notif-item.stale-alert .notif-msg {
+    &::before {
+      content: "\26A0 ";
+      font-weight: 700;
+    }
+  }
+}
+
+// ============================================
+// EQUIPMENT ADMIN MODALS (shared: AddAssetModal, EditAssetModal, TransferAssetModal, DecommissionAssetModal)
+// ============================================
+.equipment-modal-specs {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid v.$color-header-border;
+
+  .specs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      color: v.$color-text;
+    }
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+
+    .ant-form-item {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.decommission-notice {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #FFF2F0;
+  border: 1px solid #FFCCC7;
+  border-radius: v.$border-radius-sm;
+  color: v.$color-danger;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.auto-code-notice {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #F0F5FF;
+  border: 1px solid #D6E4FF;
+  border-radius: v.$border-radius-sm;
+  color: v.$color-primary;
+  font-size: 13px;
+}
+
+// ============================================
+// USER MANAGEMENT SHARED (shared: UserManagement + modals)
+// ============================================
+.user-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  &.active {
+    background-color: rgba(v.$color-success, 0.12);
+    color: v.$color-success;
+
+    .status-dot {
+      background-color: v.$color-success;
+    }
+  }
+
+  &.inactive {
+    background-color: rgba(v.$color-danger, 0.12);
+    color: v.$color-danger;
+
+    .status-dot {
+      background-color: v.$color-danger;
+    }
+  }
+}
+
+.user-modal-warning {
+  background-color: rgba(v.$color-primary, 0.06);
+  border-left: 4px solid v.$color-primary;
+  padding: 16px 20px;
+  border-radius: v.$border-radius-sm;
+  font-size: 14px;
+  line-height: 1.7;
+  color: v.$color-text;
+
+  &--danger {
+    background-color: rgba(v.$color-danger, 0.08);
+    border-left-color: v.$color-danger;
+
+    strong {
+      color: v.$color-danger;
+    }
+  }
+}
+
+// ============================================
+// AUDIT LOG SHARED
+// ============================================
+.audit-changes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th, td {
+    border: 1px solid v.$color-header-border;
+    padding: 8px 12px;
+    text-align: left;
+  }
+
+  th {
+    background-color: v.$color-bg;
+    font-weight: 600;
+    color: v.$color-text-light;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.audit-json-snippet {
+  background-color: v.$color-bg;
+  border-radius: v.$border-radius-sm;
+  padding: 12px 16px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border: 1px solid v.$color-header-border;
+}
+
+// ============================================
+// HELP SUPPORT SHARED
+// ============================================
+.contact-section {
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: v.$color-text;
+    margin: 0 0 2px;
+  }
+
+  .contact-subtitle {
+    font-size: 12px;
+    color: v.$color-text-light;
+    margin: 0;
+  }
+}
+
+.contact-items {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: v.$color-text-light;
+
+    svg {
+      color: v.$color-primary;
+      flex-shrink: 0;
+    }
+  }
+}

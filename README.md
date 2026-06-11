@@ -20,5 +20,6 @@ npm run dev
 
 ## Documentación
 
-Ver `AGENTS.md` para estructura del proyecto y convenciones.  
-Ver `Docs/` para especificaciones detalladas (contexto, API, frontend).
+- `AGENTS.md` — Instrucciones para IA, estructura del proyecto y convenciones
+- `Docs/CONTEXT.md` — Documentación maestra del sistema
+- `Docs/API.md` — Contrato completo de la API

@@ -1,3 +1,4 @@
+import './AuditLog.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, DatePicker, Input, Select, Button, Modal, Tag, Descriptions, Space } from 'antd';
 import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
@@ -144,8 +145,8 @@ export default function AuditLog() {
             {entries.map(([field, change]) => (
               <tr key={field}>
                 <td><strong>{field}</strong></td>
-                <td style={{ color: '#860404' }}>{change.from ?? '—'}</td>
-                <td style={{ color: '#1A8C06' }}>{change.to ?? '—'}</td>
+                <td className="text-danger">{change.from ?? '—'}</td>
+                <td className="text-success">{change.to ?? '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -165,20 +166,20 @@ export default function AuditLog() {
       <div className="audit-filters-bar">
         <RangePicker
           onChange={handleRangeChange}
-          style={{ flex: 1, minWidth: 200 }}
+          className="audit-filter-flex"
         />
         <Input
           placeholder="Buscar por usuario..."
           prefix={<SearchOutlined />}
           value={usernameFilter}
           onChange={(e) => { setUsernameFilter(e.target.value); setPage(1); }}
-          style={{ flex: 1, maxWidth: 300 }}
+          className="audit-filter-max-300"
           allowClear
         />
         <Select
           allowClear
           placeholder="Tipo de movimiento"
-          style={{ flex: 1, maxWidth: 220, minWidth: 160 }}
+          className="audit-filter-medium"
           value={actionFilter}
           onChange={(val) => { setActionFilter(val); setPage(1); }}
           options={[
@@ -217,7 +218,7 @@ export default function AuditLog() {
         open={!!detailModal}
         onCancel={() => setDetailModal(null)}
         footer={
-          <Space style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Space className="flex-end">
             <Button onClick={() => setDetailModal(null)}>Cerrar</Button>
           </Space>
         }
@@ -226,7 +227,7 @@ export default function AuditLog() {
       >
         {detailModal && (
           <>
-            <Descriptions column={2} size="small" bordered style={{ marginBottom: 16 }}>
+            <Descriptions column={2} size="small" bordered className="mb-16">
               <Descriptions.Item label="UUID" span={2}>{detailModal.id}</Descriptions.Item>
               <Descriptions.Item label="Fecha">{formatDateTime(detailModal.timestamp)}</Descriptions.Item>
               <Descriptions.Item label="Operador">{detailModal.user_full_name}</Descriptions.Item>
@@ -234,7 +235,7 @@ export default function AuditLog() {
               <Descriptions.Item label="Tabla Afectada">{detailModal.affected_table || '—'}</Descriptions.Item>
               <Descriptions.Item label="Registro ID">{detailModal.record_id || '—'}</Descriptions.Item>
             </Descriptions>
-            <h4 style={{ marginBottom: 8 }}>Detalles de la operación</h4>
+            <h4 className="mb-8">Detalles de la operación</h4>
             {renderChanges(detailModal.details)}
           </>
         )}

@@ -1,3 +1,4 @@
+import './KpiCard.scss';
 import { Spin } from 'antd';
 
 export default function KpiCard({ icon, value, label, trend, trendDirection, color, loading }) {

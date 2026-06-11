@@ -36,7 +36,7 @@ export default function CategoryDeleteModal({ open, onClose, onSuccess, category
       width={500}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
           <Button danger type="primary" loading={submitting} onClick={handleConfirm}>
             Eliminar

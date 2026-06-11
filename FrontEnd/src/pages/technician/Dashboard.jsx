@@ -1,3 +1,4 @@
+import './Dashboard.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Tooltip, Button } from 'antd';
 import { AlertCircle, Clock, CheckCircle, Info } from 'lucide-react';

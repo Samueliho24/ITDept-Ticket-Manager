@@ -1,3 +1,4 @@
+import './TicketListView.scss';
 import { Tag, Button, Tooltip, Spin, Empty, Badge } from 'antd';
 import { Eye, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +36,7 @@ export default function TicketListView({ tickets, loading, title = 'Tickets', sh
     <div className="ticket-list">
       <div className="ticket-list-header">
         <h2>{title}</h2>
-        <Badge count={tickets.length} style={{ backgroundColor: '#006699' }} overflowCount={99} />
+        <Badge count={tickets.length} className="ticket-list-badge" overflowCount={99} />
       </div>
 
       {loading ? (

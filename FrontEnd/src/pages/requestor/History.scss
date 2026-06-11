@@ -1,0 +1,36 @@
+@use '../../styles/abstracts/variables' as v;
+
+.requestor-history {
+  .history-filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .history-filter-status {
+    flex: 1;
+    max-width: 300px;
+    min-width: 180px;
+  }
+
+  .history-filter-date {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .history-table {
+    .ticket-id {
+      font-size: 12px;
+      font-weight: 600;
+      color: v.$color-text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .history-cancel-link {
+    color: #860404;
+  }
+}

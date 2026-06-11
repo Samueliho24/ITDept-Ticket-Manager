@@ -1,3 +1,4 @@
+import './DepartmentFormModal.scss';
 import { useState } from 'react';
 import { Modal, Form, Input, Space, Button } from 'antd';
 import { createDepartment, updateDepartment } from '../../../../services/departmentService';
@@ -38,7 +39,7 @@ export default function DepartmentFormModal({ open, onClose, onSuccess, departme
       width={480}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
           <Button type="primary" loading={submitting} onClick={handleSubmit}>
             {isEditing ? 'Guardar' : 'Crear'}
@@ -66,7 +67,7 @@ export default function DepartmentFormModal({ open, onClose, onSuccess, departme
         >
           <Input
             maxLength={3}
-            style={{ textTransform: 'uppercase' }}
+            className="department-code-input"
             onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }}
             placeholder="Ej: RHS"
           />

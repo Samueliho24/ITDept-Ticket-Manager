@@ -1,3 +1,4 @@
+import './UserManagement.scss';
 import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
 import { Table, Tag, Button, Input, Space } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
@@ -176,8 +177,7 @@ export default function UserManagement() {
           prefix={<SearchOutlined />}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="admin-users-search"
-          style={{ flex: 1 }}
+          className="admin-users-search flex-1"
           allowClear
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>

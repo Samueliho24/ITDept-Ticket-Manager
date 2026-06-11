@@ -1,3 +1,4 @@
+import './History.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Select, DatePicker, Tag } from 'antd';
 import { useLocation } from 'react-router-dom';
@@ -82,13 +83,13 @@ export default function TechnicianHistory() {
         <Select
           allowClear
           placeholder="Filtrar por estado"
-          style={{ flex: 1, maxWidth: 300, minWidth: 180 }}
+          className="history-filter-status"
           value={statusFilter}
           onChange={(val) => { setStatusFilter(val); setPage(1); }}
           options={ticketStatusList}
         />
         <RangePicker
-          style={{ flex: 1, minWidth: 200 }}
+          className="history-filter-date"
           onChange={(dates) => { setDateRange(dates); setPage(1); }}
         />
       </div>

@@ -1,3 +1,4 @@
+import './EquipmentDetailModal.scss';
 import { useState, useEffect, startTransition } from 'react';
 import { Modal, Descriptions, Tag, Table, Spin, Button, Space } from 'antd';
 import { EditOutlined, SwapOutlined, StopOutlined } from '@ant-design/icons';
@@ -69,8 +70,8 @@ export default function EquipmentDetailModal({ equipment, open, onClose, onEdit,
       footer={
         isAdmin
           ? (
-            <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-              <span style={{ color: '#64748B', fontSize: 13 }}>Acciones de administración</span>
+            <Space className="equip-modal-footer-bar">
+              <span className="equip-detail-muted">Acciones de administración</span>
               <Space>
                 <Button icon={<EditOutlined />} onClick={() => { onClose(); onEdit?.(equipment); }}>
                   Editar

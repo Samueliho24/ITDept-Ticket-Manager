@@ -5,7 +5,7 @@ import { ConfigProvider, App as AntApp } from 'antd';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import App from './App.jsx';
-import './stylesPages.scss';
+import './styles/global.scss';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

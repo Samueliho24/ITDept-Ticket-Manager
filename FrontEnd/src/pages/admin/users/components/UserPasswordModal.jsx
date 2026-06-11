@@ -1,3 +1,4 @@
+import './UserPasswordModal.scss';
 import { useState } from 'react';
 import { Modal, Form, Input, Space, Button } from 'antd';
 import { changeUserPassword } from '../../../../services/userService';
@@ -39,7 +40,7 @@ export default function UserPasswordModal({ open, onClose, onSuccess, user }) {
       width={420}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={() => { form.resetFields(); onClose(); }}>Cancelar</Button>
           <Button type="primary" loading={submitting} onClick={handleSubmit}>
             Actualizar Contraseña
@@ -47,7 +48,7 @@ export default function UserPasswordModal({ open, onClose, onSuccess, user }) {
         </Space>
       }
     >
-      <p style={{ marginBottom: 16, color: '#64748B' }}>
+      <p className="password-modal-info">
         Cambiando contraseña de: <strong>{user.name} {user.lastname}</strong>
       </p>
       <Form form={form} layout="vertical" preserve={false} requiredMark={false}>

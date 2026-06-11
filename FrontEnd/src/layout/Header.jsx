@@ -1,3 +1,4 @@
+import './Header.scss';
 import { useState, useRef, useEffect, useCallback, startTransition } from 'react';
 import { Breadcrumb, Badge, Input, Popover, List, Empty, Spin } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -144,14 +145,14 @@ export default function Header({ onMenuClick, isMobile }) {
                 {
                   title: (
                     <span
-                      style={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}
+                      className="breadcrumb-section"
                       onClick={() => navigate('/dashboard')}
                     >
                       {current.section}
                     </span>
                   ),
                 },
-                { title: <span style={{ color: '#fff' }}>{current.item}</span> },
+                { title: <span className="breadcrumb-item">{current.item}</span> },
               ]}
             />
           )}

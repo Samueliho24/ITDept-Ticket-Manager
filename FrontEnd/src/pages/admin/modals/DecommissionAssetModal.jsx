@@ -39,14 +39,14 @@ export default function DecommissionAssetModal({ open, onClose, onSuccess, equip
       width={480}
       destroyOnClose
       footer={
-        <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Space className="flex-space-between">
           <Button onClick={() => { form.resetFields(); onClose(); }}>Cancelar</Button>
           <Button type="primary" danger loading={submitting} onClick={handleSubmit}>Confirmar Cambio</Button>
         </Space>
       }
     >
       {equipment && (
-        <div style={{ marginBottom: 20 }}>
+        <div className="mb-20">
           <Descriptions column={1} size="small" bordered>
             <Descriptions.Item label="Código">{equipment.inventory_code}</Descriptions.Item>
             <Descriptions.Item label="Tipo">{equipment.equipment_type}</Descriptions.Item>

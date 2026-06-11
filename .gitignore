@@ -7,9 +7,13 @@
 BackEnd/samples
 FrontEnd/samples
 samples
-Docs/
-!Docs/tic_tickets.sql
-!Docs/api
+
+# Docs — only track consolidated files
+Docs/*
+!Docs/CONTEXT.md
+!Docs/API.md
+!Docs/ESPECIFICACIONES_INVENTARIO_TIC.md
+!Docs/tic_luz_tickets.sql
 
 
 

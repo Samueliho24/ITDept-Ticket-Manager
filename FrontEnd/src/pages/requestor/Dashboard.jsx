@@ -1,3 +1,4 @@
+import './Dashboard.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Tag, Button, Spin, Empty, Tooltip } from 'antd';

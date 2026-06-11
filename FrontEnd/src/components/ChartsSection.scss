@@ -1,0 +1,23 @@
+@use '../styles/abstracts/variables' as v;
+
+.chart-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.chart-title {
+  margin: 0;
+}
+
+.chart-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.chart-toggle-label {
+  color: v.$color-text-light;
+}

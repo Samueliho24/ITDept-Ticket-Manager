@@ -1,3 +1,4 @@
+import './TicketAssignment.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Select, Button, Tag, Avatar, Space } from 'antd';
 import { Check, Users, Clock, AlertCircle, User } from 'lucide-react';
@@ -109,7 +110,7 @@ export default function TicketAssignment() {
       dataIndex: 'ticket_number',
       key: 'ticket_number',
       width: 160,
-      render: (v) => <span className="ticket-id" style={{ fontSize: 12 }}>{v || '—'}</span>,
+      render: (v) => <span className="ticket-id fs-12">{v || '—'}</span>,
     },
     {
       title: 'Solicitante',
@@ -136,7 +137,7 @@ export default function TicketAssignment() {
         <Select
           placeholder={record.priority || '—'}
           size="small"
-          style={{ width: '100%' }}
+          className="w-100"
           value={priorities[record.id] || record.priority || undefined}
           onChange={(val) => setPriorities((prev) => ({ ...prev, [record.id]: val }))}
           options={priorityList}
@@ -158,7 +159,7 @@ export default function TicketAssignment() {
         const days = getDaysElapsed(r.opened_at);
         return (
           <div>
-            <div style={{ fontSize: 13, lineHeight: 1.3 }}>{formatDate(r.opened_at)}</div>
+            <div className="ta-date-block">{formatDate(r.opened_at)}</div>
             <div style={{
               fontSize: 11, color: days >= 5 ? '#860404' : '#64748B',
               fontWeight: days >= 5 ? 600 : 400,
@@ -184,7 +185,7 @@ export default function TicketAssignment() {
           showSearch
           optionFilterProp="label"
           size="small"
-          style={{ width: '100%' }}
+          className="w-100"
           value={assignments[record.id] || undefined}
           onChange={(val) => setAssignments((prev) => ({ ...prev, [record.id]: val }))}
           options={users.map((u) => ({
@@ -195,12 +196,12 @@ export default function TicketAssignment() {
           }))}
           optionRender={(option) => (
             <Space size={8}>
-              <Avatar size={20} style={{ backgroundColor: '#006699', fontSize: 10, flexShrink: 0 }}>
+              <Avatar size={20} className="ta-avatar">
                 {option.data.initials}
               </Avatar>
-              <span style={{ fontSize: 13 }}>{option.data.label}</span>
+              <span className="ta-tech-name">{option.data.label}</span>
               {option.data.role === 'admin' && (
-                <Tag color="blue" style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px' }}>Admin</Tag>
+                <Tag color="blue" className="ta-admin-tag">Admin</Tag>
               )}
             </Space>
           )}

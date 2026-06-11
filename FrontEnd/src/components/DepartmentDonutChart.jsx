@@ -1,3 +1,4 @@
+import './DepartmentDonutChart.scss';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Spin, Empty } from 'antd';
 
@@ -5,7 +6,7 @@ const COLORS = ['#006699', '#D97706', '#1A8C06', '#860404', '#6B7280', '#8B5CF6'
 
 export default function DepartmentDonutChart({ data, loading }) {
   if (loading) {
-    return <div className="chart-card__loading" style={{ padding: 40, textAlign: 'center' }}><Spin /></div>;
+    return <div className="chart-card__loading chart-loading-center"><Spin /></div>;
   }
 
   if (!data || data.length === 0) {

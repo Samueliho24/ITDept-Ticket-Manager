@@ -1,3 +1,4 @@
+import './Settings.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Button, Tag, Space, InputNumber, Form } from 'antd';
 import { PlusOutlined, EditOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';

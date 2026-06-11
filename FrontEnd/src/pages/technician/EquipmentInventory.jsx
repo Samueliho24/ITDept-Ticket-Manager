@@ -1,3 +1,4 @@
+import './EquipmentInventory.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Input, Select, Button, Tooltip, Dropdown } from 'antd';
 import { Search, Eye, MoreVertical } from 'lucide-react';
@@ -144,14 +145,14 @@ export default function EquipmentInventory() {
           placeholder="Buscar por código, marca o modelo..."
           prefix={<Search size={16} />}
           allowClear
-          style={{ flex: 1, minWidth: 200 }}
+          className="filter-flex-min-200"
           value={filters.search}
           onChange={(e) => { setFilters((p) => ({ ...p, search: e.target.value })); setPage(1); }}
         />
         <Select
           allowClear
           placeholder="Tipo"
-          style={{ width: 160 }}
+          className="filter-width-160"
           value={filters.equipment_type || undefined}
           onChange={(v) => { setFilters((p) => ({ ...p, equipment_type: v })); setPage(1); }}
           options={equipmentTypeList}
@@ -159,7 +160,7 @@ export default function EquipmentInventory() {
         <Select
           allowClear
           placeholder="Estado"
-          style={{ width: 160 }}
+          className="filter-width-160"
           value={filters.status || undefined}
           onChange={(v) => { setFilters((p) => ({ ...p, status: v })); setPage(1); }}
           options={equipmentStatusList}
