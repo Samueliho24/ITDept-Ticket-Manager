@@ -1,7 +1,8 @@
 import './UserManagement.scss';
 import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
-import { Table, Tag, Button, Input, Space } from 'antd';
+import { Table, Tag, Button, Input, Dropdown, Tooltip } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
+import { MoreVertical } from 'lucide-react';
 import { listUsers } from '../../../services/userService';
 import { listDepartments } from '../../../services/departmentService';
 import { ROLE_LABELS } from '../../../context/AuthContext';
@@ -110,6 +111,13 @@ export default function UserManagement() {
     fetchUsers();
   };
 
+  const userActionItems = (record) => [
+    { key: 'edit', icon: <EditOutlined />, label: 'Editar', onClick: () => openEditModal(record) },
+    { key: 'status', icon: record.active === 1 ? <CloseCircleOutlined /> : <CheckCircleOutlined />, label: record.active === 1 ? 'Desactivar' : 'Activar', onClick: () => openStatusModal(record) },
+    { key: 'delete', icon: <DeleteOutlined />, label: 'Eliminar', danger: true, onClick: () => openDeleteModal(record) },
+    { key: 'password', icon: <KeyOutlined />, label: 'Cambiar contraseña', onClick: () => openPasswordModal(record) },
+  ];
+
   const columns = [
     {
       title: 'Nombre Completo',
@@ -154,16 +162,15 @@ export default function UserManagement() {
       ),
     },
     {
-      title: 'Acciones',
+      title: '',
       key: 'actions',
-      width: 180,
+      width: 60,
       render: (_, record) => (
-        <Space className="user-actions-bar">
-          <Button type="text" icon={<EditOutlined />} onClick={() => openEditModal(record)} title="Editar" />
-          <Button type="text" icon={record.active === 1 ? <CloseCircleOutlined /> : <CheckCircleOutlined />} onClick={() => openStatusModal(record)} title={record.active === 1 ? 'Desactivar' : 'Activar'} />
-          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => openDeleteModal(record)} title="Eliminar" />
-          <Button type="text" icon={<KeyOutlined />} onClick={() => openPasswordModal(record)} title="Cambiar contraseña" />
-        </Space>
+        <Dropdown menu={{ items: userActionItems(record) }} trigger={['click']} placement="bottomRight">
+          <Tooltip title="Acciones">
+            <Button type="text" icon={<MoreVertical size={18} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];

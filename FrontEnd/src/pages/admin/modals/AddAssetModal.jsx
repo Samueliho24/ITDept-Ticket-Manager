@@ -39,7 +39,7 @@ export default function AddAssetModal({ open, onClose, onSuccess, departments })
       });
       setSubmitting(true);
       await createEquipment({
-        inventory_code: values.inventory_code,
+        inventory_code: undefined,
         equipment_type: values.equipment_type,
         brand: values.brand || null,
         model: values.model || null,
@@ -128,7 +128,7 @@ export default function AddAssetModal({ open, onClose, onSuccess, departments })
         </Space>
 
         <Space className="w-100" size="middle">
-          <Form.Item name="assigned_person" label="Persona Asignada (Opcional)" className="flex-1">
+          <Form.Item name="assigned_person" label="Persona Asignada (Opcional)" className="flex-1" rules={[{ pattern: /^\D*$/, message: 'El nombre no puede contener números' }, { whitespace: true, message: 'El nombre no puede ser solo espacios' }]}>
             <Input placeholder="Nombre del custodio" />
           </Form.Item>
           <Form.Item name="department_id" label="Ubicación / Departamento" className="flex-1">

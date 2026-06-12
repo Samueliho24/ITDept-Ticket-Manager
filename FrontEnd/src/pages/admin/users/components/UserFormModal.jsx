@@ -10,13 +10,25 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
   const [submitting, setSubmitting] = useState(false);
   const isEditing = !!user;
 
+  const lettersKeyDown = (e) => {
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]$/.test(e.key)) e.preventDefault();
+  };
+
+  const lettersPaste = (e) => {
+    const text = e.clipboardData.getData('text');
+    if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/.test(text)) e.preventDefault();
+  };
+
+  const handlePhoneChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 11);
+    e.target.value = raw.length > 4 ? `${raw.slice(0, 4)}-${raw.slice(4)}` : raw;
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      if (!isEditing && values.password !== values.confirmPassword) {
-        messageApi.error('Las contraseñas no coinciden.');
-        return;
-      }
       setSubmitting(true);
       if (isEditing) {
         await updateUser(user.id, {
@@ -56,6 +68,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
       onCancel={onClose}
       width={520}
       destroyOnClose
+      closable={false}
       footer={
         <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
@@ -66,30 +79,33 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
       }
     >
       <Form form={form} layout="vertical" preserve={false} requiredMark={false}>
-        <div className="mb-24">
           <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="name"
               label="Nombre"
-              rules={[{ required: true, message: 'Campo requerido' }]}
-              className="mb-0"
+              rules={[
+                { required: true, message: 'Campo requerido' },
+                { pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, message: 'Solo se permiten letras' },
+              ]}
+              
               initialValue={user?.name}
             >
-              <Input />
+              <Input onKeyDown={lettersKeyDown} onPaste={lettersPaste} />
             </Form.Item>
             <Form.Item
               name="lastname"
               label="Apellido"
-              rules={[{ required: true, message: 'Campo requerido' }]}
-              className="mb-0"
+              rules={[
+                { required: true, message: 'Campo requerido' },
+                { pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, message: 'Solo se permiten letras' },
+              ]}
+              
               initialValue={user?.lastname}
             >
-              <Input />
+              <Input onKeyDown={lettersKeyDown} onPaste={lettersPaste} />
             </Form.Item>
           </Space>
-        </div>
 
-        <div className="mb-24">
           <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="username"
@@ -97,8 +113,9 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
               rules={[
                 { required: true, message: 'Campo requerido' },
                 { min: 3, message: 'Mínimo 3 caracteres' },
+                { pattern: /^[a-zA-Z0-9_]+$/, message: 'Solo letras, números y guión bajo' },
               ]}
-              className="mb-0"
+              
               initialValue={user?.username}
             >
               <Input disabled={isEditing} />
@@ -106,16 +123,17 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
             <Form.Item
               name="phone"
               label="Teléfono"
-              className="mb-0"
+              rules={[
+                { pattern: /^\d{4}-\d{7}$/, message: 'Debe tener formato 0000-0000000' },
+              ]}
+              
               initialValue={user?.phone}
             >
-              <Input placeholder="Ej: +58 412-1234567" />
+              <Input placeholder="0000-0000000" onChange={handlePhoneChange} maxLength={12} />
             </Form.Item>
           </Space>
-        </div>
 
         {!isEditing && (
-          <div className="mb-24">
             <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
               <Form.Item
                 name="password"
@@ -124,7 +142,7 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
                   { required: true, message: 'Campo requerido' },
                   { min: 6, message: 'Mínimo 6 caracteres' },
                 ]}
-                className="mb-0"
+                
               >
                 <Input.Password />
               </Form.Item>
@@ -141,21 +159,19 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
                     },
                   }),
                 ]}
-                className="mb-0"
+                
               >
                 <Input.Password />
               </Form.Item>
             </Space>
-          </div>
         )}
 
-        <div className="mb-0">
           <Space className="w-100" size="middle" styles={{ item: { flex: 1 } }}>
             <Form.Item
               name="role"
               label="Rol"
               rules={[{ required: true, message: 'Campo requerido' }]}
-              className="mb-0"
+              
               initialValue={user?.role}
             >
               <Select options={rolTypeList} />
@@ -163,17 +179,17 @@ export default function UserFormModal({ open, onClose, onSuccess, user, departme
             <Form.Item
               name="department_id"
               label="Departamento"
-              className="mb-0"
+              
               initialValue={user?.department_id || undefined}
             >
               <Select
                 allowClear
                 placeholder="Seleccionar departamento"
                 options={departments.map((d) => ({ label: d.name, value: d.id }))}
+                rules={[{ required: true, message: 'Campo requerido' }]}
               />
             </Form.Item>
           </Space>
-        </div>
       </Form>
     </Modal>
   );

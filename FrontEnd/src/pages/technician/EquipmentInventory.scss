@@ -33,15 +33,6 @@
     }
   }
 
-  .equip-action-trigger {
-    color: v.$color-text-light;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: v.$color-accent;
-    }
-  }
-
   .filter-flex-min-200 {
     flex: 1;
     min-width: 200px;

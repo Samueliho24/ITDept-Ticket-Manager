@@ -124,7 +124,7 @@ export default function EquipmentInventory() {
         isAdmin ? (
           <Dropdown menu={{ items: adminDropdownItems(record) }} trigger={['click']} placement="bottomRight">
             <Tooltip title="Acciones">
-              <Button type="text" icon={<MoreVertical size={18} />} className="equip-action-trigger" />
+              <Button type="text" icon={<MoreVertical size={18} />} />
             </Tooltip>
           </Dropdown>
         ) : (

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 from datetime import datetime
 
@@ -11,7 +11,7 @@ class EquipmentCreate(BaseModel):
     serial: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
     department_id: Optional[str] = None
-    assigned_person: Optional[str] = None
+    assigned_person: Optional[str] = Field(None, max_length=200, pattern=r'^\D*$')
 
 
 class EquipmentUpdate(BaseModel):
@@ -21,7 +21,7 @@ class EquipmentUpdate(BaseModel):
     model: Optional[str] = None
     serial: Optional[str] = None
     technical_specifications: Optional[Dict[str, Any]] = None
-    assigned_person: Optional[str] = None
+    assigned_person: Optional[str] = Field(None, max_length=200, pattern=r'^\D*$')
 
 
 class EquipmentLocationUpdate(BaseModel):

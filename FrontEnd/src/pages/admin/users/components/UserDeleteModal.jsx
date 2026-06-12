@@ -42,6 +42,7 @@ export default function UserDeleteModal({ open, onClose, onSuccess, user }) {
       onCancel={onClose}
       width={500}
       destroyOnClose
+      closable={false}
       footer={
         <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>

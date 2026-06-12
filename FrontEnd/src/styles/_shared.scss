@@ -18,12 +18,16 @@
     border-radius: 16px;
     padding: 40px;
     width: 100%;
+
     max-width: 420px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 
     .header {
       text-align: center;
       margin-bottom: 32px;
+      height: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .logo-zone {

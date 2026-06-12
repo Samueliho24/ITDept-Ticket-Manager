@@ -1,7 +1,8 @@
 import './Settings.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
-import { Table, Button, Tag, Space, InputNumber, Form } from 'antd';
+import { Table, Button, Tag, InputNumber, Form, Dropdown, Tooltip } from 'antd';
 import { PlusOutlined, EditOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { MoreVertical } from 'lucide-react';
 import { listDepartments } from '../../../services/departmentService';
 import { listCategories } from '../../../services/categoryService';
 import DepartmentFormModal from './components/DepartmentFormModal';
@@ -145,6 +146,19 @@ export default function Settings() {
     fetchCategories();
   };
 
+  // --- Action items ---
+  const deptActionItems = (record) => [
+    { key: 'edit', icon: <EditOutlined />, label: 'Editar', onClick: () => openEditDept(record) },
+    { key: 'status', icon: record.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />, label: record.is_active ? 'Desactivar' : 'Activar', onClick: () => openStatusDept(record) },
+    { key: 'delete', icon: <DeleteOutlined />, label: 'Eliminar', danger: true, onClick: () => openDeleteDept(record) },
+  ];
+
+  const catActionItems = (record) => [
+    { key: 'edit', icon: <EditOutlined />, label: 'Editar', onClick: () => openEditCat(record) },
+    { key: 'status', icon: record.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />, label: record.is_active ? 'Deshabilitar' : 'Habilitar', onClick: () => openStatusCat(record) },
+    { key: 'delete', icon: <DeleteOutlined />, label: 'Eliminar', danger: true, onClick: () => openDeleteCat(record) },
+  ];
+
   // --- Columns ---
   const deptColumns = [
     { title: 'Nombre', dataIndex: 'name', key: 'name' },
@@ -158,15 +172,15 @@ export default function Settings() {
       ),
     },
     {
-      title: 'Acciones',
+      title: '',
       key: 'actions',
-      width: 170,
+      width: 60,
       render: (_, record) => (
-        <Space className="user-actions-bar">
-          <Button type="text" icon={<EditOutlined />} onClick={() => openEditDept(record)} title="Editar" />
-          <Button type="text" icon={record.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />} onClick={() => openStatusDept(record)} title={record.is_active ? 'Desactivar' : 'Activar'} />
-          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => openDeleteDept(record)} title="Eliminar" />
-        </Space>
+        <Dropdown menu={{ items: deptActionItems(record) }} trigger={['click']} placement="bottomRight">
+          <Tooltip title="Acciones">
+            <Button type="text" icon={<MoreVertical size={18} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];
@@ -182,15 +196,15 @@ export default function Settings() {
       ),
     },
     {
-      title: 'Acciones',
+      title: '',
       key: 'actions',
-      width: 170,
+      width: 60,
       render: (_, record) => (
-        <Space className="user-actions-bar">
-          <Button type="text" icon={<EditOutlined />} onClick={() => openEditCat(record)} title="Editar" />
-          <Button type="text" icon={record.is_active ? <CloseCircleOutlined /> : <CheckCircleOutlined />} onClick={() => openStatusCat(record)} title={record.is_active ? 'Deshabilitar' : 'Habilitar'} />
-          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => openDeleteCat(record)} title="Eliminar" />
-        </Space>
+        <Dropdown menu={{ items: catActionItems(record) }} trigger={['click']} placement="bottomRight">
+          <Tooltip title="Acciones">
+            <Button type="text" icon={<MoreVertical size={18} />} />
+          </Tooltip>
+        </Dropdown>
       ),
     },
   ];
