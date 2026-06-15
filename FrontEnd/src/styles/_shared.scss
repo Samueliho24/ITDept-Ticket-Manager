@@ -324,6 +324,11 @@
     flex-wrap: wrap;
     gap: 10px;
   }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    gap: 8px;
+    padding: 12px 14px;
+  }
 }
 
 .ticket-col {
@@ -352,6 +357,11 @@
     color: v.$color-text;
     margin-top: 2px;
   }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 0 0 100%;
+    padding-right: 0;
+  }
 }
 
 .ticket-col-dept {
@@ -364,12 +374,22 @@
     font-weight: 500;
     color: v.$color-text-light;
   }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
 }
 
 .ticket-col-cat {
   flex: 0 0 14%;
   display: flex;
   justify-content: center;
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
 }
 
 .ticket-col-date {
@@ -392,6 +412,19 @@
       color: #B91C1C;
     }
   }
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 1 1 auto;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .ticket-date,
+    .ticket-days {
+      display: inline;
+    }
+  }
 }
 
 .ticket-col-action {
@@ -400,6 +433,10 @@
   justify-content: flex-end;
   align-items: center;
   gap: 6px;
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 0 0 auto;
+  }
 }
 
 .btn-atender {
@@ -418,6 +455,11 @@
   flex: 0 0 14%;
   display: flex;
   justify-content: center;
+
+  @media (max-width: v.$breakpoint-mobile) {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+  }
 }
 
 // ============================================

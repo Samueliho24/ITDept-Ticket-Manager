@@ -13,6 +13,6 @@ class TicketHistory(Base):
     technical_comment = Column(String(500))
     technical_action = Column(String(100))
     reason = Column(String(255), nullable=True)
-    change_date = Column(DateTime, default=datetime.datetime.utcnow)
+    change_date = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     ticket = relationship("Tickets", foreign_keys=[ticket_id], back_populates="history")

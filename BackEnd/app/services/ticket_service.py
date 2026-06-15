@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
+from sqlalchemy.exc import IntegrityError
 from BackEnd.app.models.tickets import Tickets
 from BackEnd.app.models.history_tickets import TicketHistory
 from BackEnd.app.models.ticket_ratings import TicketRating
@@ -114,6 +115,7 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
                 Tickets.department_id == data.department_id,
                 func.date(Tickets.opened_at) == now.date(),
             )
+            .with_for_update()
             .scalar()
         )
         daily_sequence = (max_seq or 0) + 1
@@ -141,7 +143,14 @@ def create_ticket(db: Session, data: TicketCreate, current_user: Users) -> Ticke
     _register_ticket_history(db, ticket, None, "Abierto")
     _register_audit(db, current_user, "create_ticket", ticket)
     ticket.requester_name = f"{current_user.name} {current_user.lastname}" if current_user.name else current_user.username
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Error de concurrencia al crear el ticket. Intente nuevamente.",
+        )
     db.refresh(ticket)
     return ticket
 
@@ -181,6 +190,7 @@ def list_tickets(
             or_(
                 Tickets.title.ilike(f"%{search}%"),
                 Tickets.description.ilike(f"%{search}%"),
+                Tickets.ticket_number.ilike(f"%{search}%"),
             )
         )
     if equipment_id:
@@ -227,7 +237,7 @@ def assign_ticket(db: Session, ticket_id: str, data: TicketAssign, current_user:
     ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
-    technician = db.query(Users).filter(Users.id == data.technician_id, Users.role.in_(["technician", "admin"])).first()
+    technician = db.query(Users).filter(Users.id == data.technician_id, Users.role.in_(["technician", "admin"]), Users.active == 1).first()
     if not technician:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Técnico no encontrado o no válido.")
     previous_status = ticket.status
@@ -379,6 +389,7 @@ def cancel_ticket(db: Session, ticket_id: str, data: TicketCancel, current_user:
         )
     previous_status = ticket.status
     ticket.status = "Anulado"
+    ticket.closed_at = datetime.now(timezone.utc)
     _register_ticket_history(db, ticket, previous_status, "Anulado", reason=data.reason, action=f"Anulado por {current_user.username}")
     _register_audit(db, current_user, "cancel_ticket", ticket, {
         "previous_status": previous_status,

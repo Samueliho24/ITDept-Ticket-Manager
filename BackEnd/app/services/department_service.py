@@ -27,13 +27,13 @@ def _register_audit(db: Session, current_user: Users, action: str, department: D
 
 
 def create_department(db: Session, name: str, code: str, current_user: Users) -> Departments:
-    existing = db.query(Departments).filter(Departments.name == name).first()
+    existing = db.query(Departments).filter(Departments.name == name, Departments.deleted_at.is_(None)).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Ya existe un departamento con ese nombre.",
         )
-    existing_code = db.query(Departments).filter(Departments.code == code).first()
+    existing_code = db.query(Departments).filter(Departments.code == code, Departments.deleted_at.is_(None)).first()
     if existing_code:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

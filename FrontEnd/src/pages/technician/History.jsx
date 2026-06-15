@@ -1,7 +1,8 @@
 import './History.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
-import { Table, Select, DatePicker, Tag } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { Table, Select, DatePicker, Space, Tag, Button, Tooltip } from 'antd';
+import { Eye } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listTickets } from '../../services/ticketService';
 import { ticketStatusList } from '../../constants/lists';
 
@@ -28,8 +29,9 @@ export default function TechnicianHistory() {
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState(null);
   const [dateRange, setDateRange] = useState(null);
-  const location = useLocation();
-  const searchQuery = location.state?.search || '';
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
@@ -59,25 +61,38 @@ export default function TechnicianHistory() {
 
   const columns = [
     {
-      title: 'ID', dataIndex: 'id', key: 'id', width: 90,
-      render: (id) => <span className="ticket-id">#{id?.slice(0, 8)}</span>,
+      title: 'ID', dataIndex: 'id', key: 'id', width: 100,
+      render: (_, record) => <span className="ticket-id">{record.ticket_number || `#${record.id.slice(0, 8)}`}</span>,
     },
-    { title: 'Título', dataIndex: 'title', key: 'title', ellipsis: true },
-    { title: 'Solicitante', dataIndex: 'requester_name', key: 'requester', width: 140, render: (v) => v || '—' },
+    { title: 'Descripción', dataIndex: 'title', key: 'title', ellipsis: true },
+    { title: 'Solicitante', dataIndex: 'requester_name', key: 'requester', width: 150, render: (v) => v || '—', responsive: ['md' ] },
     {
       title: 'Estado', dataIndex: 'status', key: 'status', width: 120,
       render: (s) => <Tag color={statusColor(s)}>{s}</Tag>,
     },
-    { title: 'Categoría', dataIndex: 'category', key: 'category', width: 130, render: (v) => v || '—' },
-    { title: 'Prioridad', dataIndex: 'priority', key: 'priority', width: 90 },
+    { title: 'Prioridad', dataIndex: 'priority', key: 'priority', width: 100, responsive: ['lg' ] },
     {
-      title: 'Fecha', dataIndex: 'opened_at', key: 'opened_at', width: 100,
+      title: 'Fecha', dataIndex: 'opened_at', key: 'opened_at', width: 110,
       render: (d) => (d ? new Date(d).toLocaleDateString('es-ES') : '—'),
+      responsive: ['md' ],
+    },
+    {
+      title: 'Acción', key: 'action', width: 140,
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="Ver detalle">
+            <Button type="text" icon={<Eye size={18} />} onClick={() => navigate(`/workspace/${record.ticket_number || record.id}`)} />
+          </Tooltip>
+          {record.status !== 'Resuelto' && record.status !== 'Cerrado' && (
+            <a onClick={() => navigate(`/workspace/${record.ticket_number || record.id}`)} className="history-atender-link">Atender</a>
+          )}
+        </Space>
+      ),
     },
   ];
 
   return (
-    <div className="requestor-history">
+    <div className="technician-history">
       <h2 className="page-title">HISTORIAL DE TICKETS ASIGNADOS</h2>
       <div className="history-filter-bar">
         <Select
@@ -98,6 +113,7 @@ export default function TechnicianHistory() {
         columns={columns}
         rowKey="id"
         loading={loading}
+        scroll={{ x: 'max-content' }}
         pagination={{
           current: page, pageSize, total,
           onChange: (p, ps) => { setPage(p); setPageSize(ps); },

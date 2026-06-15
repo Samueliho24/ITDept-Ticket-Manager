@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from BackEnd.app.models.tickets import Tickets
 from BackEnd.app.models.history_tickets import TicketHistory
 from BackEnd.app.models.departments import Departments
@@ -22,6 +23,7 @@ def _generate_ticket_number(db: Session, department_id: str | None) -> str | Non
             Tickets.department_id == department_id,
             func.date(Tickets.opened_at) == now.date(),
         )
+        .with_for_update()
         .scalar()
     )
     daily_sequence = (max_seq or 0) + 1
@@ -71,7 +73,14 @@ def create_public_ticket(db: Session, data: PublicTicketCreate) -> Tickets:
     if data.department_id:
         dept = db.query(Departments).filter(Departments.id == data.department_id).first()
         ticket.department_name = dept.name if dept else None
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Error de concurrencia al reportar el ticket. Intente nuevamente.",
+        )
     db.refresh(ticket)
     return ticket
 

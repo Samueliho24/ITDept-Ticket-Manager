@@ -17,7 +17,7 @@ class Equipment(Base):
     status = Column(String(50), default="Operativo")
     department_id = Column(String(36), ForeignKey("departments.id"))
     assigned_person = Column(String(200), nullable=True)
-    entry_date = Column(DateTime, default=datetime.datetime.utcnow)
+    entry_date = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     out_date = Column(DateTime, nullable=True)
 
     department = relationship("Departments", back_populates="equipment")

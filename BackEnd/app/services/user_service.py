@@ -1,7 +1,9 @@
 import uuid
+from typing import Optional
 from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from BackEnd.app.models.users import Users
 from BackEnd.app.models.audit_log import AuditLog
 from BackEnd.app.core.security import hash_password
@@ -126,7 +128,7 @@ def soft_delete_user(db: Session, user_id: str, current_user: Users) -> dict:
         "to_active": -1,
     })
     db.commit()
-    return {"detail": "Usuario eliminado permanentemente."}
+    return {"detail": "Usuario desactivado y marcado como eliminado."}
 
 
 def change_user_password(db: Session, user_id: str, new_password: str, current_user: Users) -> Users:
@@ -143,8 +145,22 @@ def change_user_password(db: Session, user_id: str, new_password: str, current_u
     return user
 
 
-def list_users(db: Session, limit: int = 10, offset: int = 0) -> tuple[list[Users], int]:
-    query = db.query(Users).filter(Users.active >= 0).order_by(Users.created_at.desc())
+def list_users(
+    db: Session,
+    limit: int = 10,
+    offset: int = 0,
+    search: Optional[str] = None,
+) -> tuple[list[Users], int]:
+    query = db.query(Users).filter(Users.active >= 0)
+    if search:
+        query = query.filter(
+            or_(
+                Users.name.ilike(f"%{search}%"),
+                Users.lastname.ilike(f"%{search}%"),
+                Users.username.ilike(f"%{search}%"),
+            )
+        )
+    query = query.order_by(Users.created_at.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()
     return items, total

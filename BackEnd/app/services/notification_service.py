@@ -22,10 +22,13 @@ def list_notifications(
     current_user: Users,
     limit: int = 10,
     offset: int = 0,
+    unread_only: bool = False,
 ) -> tuple[list[NotificationRead], int]:
     query = db.query(NotificationRead).filter(
         NotificationRead.user_id == current_user.id
     )
+    if unread_only:
+        query = query.filter(NotificationRead.read_at.is_(None))
     query = query.order_by(NotificationRead.created_at.desc())
     total = query.count()
     items = query.offset(offset).limit(limit).all()

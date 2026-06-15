@@ -14,7 +14,7 @@ class Users(Base):
     password = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False)
     active = Column(Integer, default=1)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     department_id = Column(String(36), ForeignKey("departments.id"))
 
     department = relationship("Departments", foreign_keys=[department_id], back_populates="user")

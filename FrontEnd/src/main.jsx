@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider, App as AntApp } from 'antd';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+import { SearchProvider } from './context/SearchContext';
 import App from './App.jsx';
 import './styles/global.scss';
 
@@ -40,7 +41,9 @@ createRoot(document.getElementById('root')).render(
         <AntApp>
           <AuthProvider>
             <AppProvider>
-              <App />
+              <SearchProvider>
+                <App />
+              </SearchProvider>
             </AppProvider>
           </AuthProvider>
         </AntApp>

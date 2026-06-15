@@ -13,6 +13,7 @@ import EquipmentInventory from '../pages/technician/EquipmentInventory';
 import AdminDashboard from '../pages/admin/Dashboard';
 import UserManagement from '../pages/admin/users/UserManagement';
 import AuditLog from '../pages/admin/AuditLog';
+import AdminHistory from '../pages/admin/History';
 import Settings from '../pages/admin/settings/Settings';
 import TicketAssignment from '../pages/admin/TicketAssignment';
 import HelpSupport from '../pages/common/HelpSupport';
@@ -27,7 +28,8 @@ function RoleDashboard() {
 
 function RoleHistory() {
   const { user } = useAuth();
-  if (user?.role === 'technician' || user?.role === 'admin') return <TechnicianHistory />;
+  if (user?.role === 'admin') return <AdminHistory />;
+  if (user?.role === 'technician') return <TechnicianHistory />;
   return <RequestorHistory />;
 }
 

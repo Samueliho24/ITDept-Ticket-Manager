@@ -146,30 +146,114 @@
   justify-content: center;
 }
 
-.mobile-search-bar {
-  width: 100%;
-  padding: 0 0 12px;
-  order: 3;
+// --- Desktop search popover ---
+.search-popover {
+  .ant-popover-inner {
+    padding: 0;
+  }
+  .ant-popover-arrow {
+    display: none;
+  }
+  width: 480px !important;
+  max-width: calc(100vw - 48px);
+}
 
-  .mobile-search-input {
-    width: 100%;
+.search-dropdown {
+  max-height: 480px;
+  overflow-y: auto;
+}
 
-    .ant-input-affix-wrapper {
-      background: #fff;
-      border: 1px solid #d9d9d9;
-      border-radius: 8px;
+.search-loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
 
-      .ant-input {
-        color: #000;
+.search-empty {
+  text-align: center;
+  padding: 24px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
 
-        &::placeholder {
-          color: rgba(0, 0, 0, 0.45);
-        }
-      }
+.search-section {
+  &:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
 
-      .ant-input-prefix {
-        color: rgba(0, 0, 0, 0.45);
-      }
-    }
+.search-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(0, 0, 0, 0.45);
+  padding: 10px 12px 6px;
+  text-transform: uppercase;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .search-item-code {
+    font-size: 12px;
+    font-weight: 600;
+    color: v.$color-primary;
+    white-space: nowrap;
+    min-width: 72px;
+  }
+
+  .search-item-title {
+    flex: 1;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .search-item-tag {
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+}
+
+.search-input-icon {
+  color: rgba(0, 0, 0, 0.35);
+  margin-right: 4px;
+}
+
+// --- Mobile search drawer ---
+.mobile-search-overlay {
+  .ant-drawer-body {
+    padding: 16px;
+    background: #f5f5f5;
+  }
+}
+
+.mobile-search-overlay-header {
+  margin-bottom: 12px;
+}
+
+.mobile-search-overlay-input {
+  &.ant-input-affix-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.mobile-search-overlay-results {
+  .search-empty {
+    padding-top: 48px;
   }
 }

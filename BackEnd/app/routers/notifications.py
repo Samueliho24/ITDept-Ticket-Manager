@@ -20,10 +20,7 @@ def list_notifications_endpoint(
     db: Session = Depends(getDb),
     current_user: Users = Depends(get_current_active_user),
 ):
-    items, total = list_notifications(db, current_user, limit, offset)
-    if unread_only:
-        items = [n for n in items if n.read_at is None]
-    total = len(items)
+    items, total = list_notifications(db, current_user, limit, offset, unread_only=unread_only)
     return NotificationPaginated(total=total, limit=limit, offset=offset, items=items)
 
 

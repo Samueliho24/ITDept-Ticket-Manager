@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -32,7 +32,7 @@ def _generate_inventory_code(db: Session, equipment_type: str) -> tuple[str, int
     prefix = EQUIPMENT_PREFIXES.get(equipment_type, "OTR")
     max_seq = db.query(func.max(Equipment.sequence)).filter(
         Equipment.equipment_type == equipment_type
-    ).scalar()
+    ).with_for_update().scalar()
     sequence = (max_seq or 0) + 1
     code = f"{prefix}-{sequence:06d}"
     return code, sequence
@@ -51,7 +51,7 @@ def _register_audit(db: Session, user: Users, action: str, equipment: Equipment,
         affected_table="equipment",
         record_id=equipment.id,
         details=details,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(audit)
 
@@ -69,7 +69,7 @@ def create_equipment(db: Session, data: EquipmentCreate, current_user: Users) ->
         technical_specifications=data.technical_specifications,
         department_id=data.department_id,
         status="Operativo",
-        entry_date=datetime.utcnow(),
+        entry_date=datetime.now(timezone.utc),
     )
     db.add(equipment)
     db.flush()

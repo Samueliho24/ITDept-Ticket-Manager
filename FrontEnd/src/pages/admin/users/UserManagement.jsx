@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback, startTransition } from 'reac
 import { Table, Tag, Button, Input, Dropdown, Tooltip } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
 import { MoreVertical } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { listUsers } from '../../../services/userService';
 import { listDepartments } from '../../../services/departmentService';
 import { ROLE_LABELS } from '../../../context/AuthContext';
@@ -12,12 +13,13 @@ import UserDeleteModal from './components/UserDeleteModal';
 import UserPasswordModal from './components/UserPasswordModal';
 
 export default function UserManagement() {
+  const [searchParams] = useSearchParams();
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('q') || '');
   const [departments, setDepartments] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formModalOpen, setFormModalOpen] = useState(false);

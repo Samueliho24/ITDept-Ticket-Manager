@@ -19,7 +19,9 @@ export default function ResolveTicketModal({ ticketId, open, onClose }) {
       const values = await form.validateFields();
       setSubmitting(true);
       await resolveTicket(ticketId, {
-        technical_notes: values.diagnostico,
+        technical_notes: [values.diagnostico, values.acciones]
+            .filter(Boolean)
+            .join('\n\n--- Acciones Realizadas ---\n'),
         equipment_status: values.estado_final,
         spare_parts_used: values.repuestos || null,
       });

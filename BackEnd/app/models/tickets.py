@@ -21,7 +21,7 @@ class Tickets(Base):
     department_id = Column(String(36), ForeignKey("departments.id"), nullable=True)
     rated = Column(Boolean, default=False)
     daily_sequence = Column(Integer, default=0)
-    opened_at = Column(DateTime, default=datetime.datetime.utcnow)
+    opened_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     closed_at = Column(DateTime, nullable=True)
 
     requester = relationship("Users", foreign_keys=[requester_id], back_populates="tickets_requested")

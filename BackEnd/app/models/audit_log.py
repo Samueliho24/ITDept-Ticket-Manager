@@ -12,6 +12,6 @@ class AuditLog(Base):
     affected_table = Column(String(50))
     record_id = Column(String(36))
     details = Column(JSON)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     user = relationship("Users", foreign_keys=[user_id], back_populates="audit_logs")

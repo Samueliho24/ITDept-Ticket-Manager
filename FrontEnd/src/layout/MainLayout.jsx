@@ -7,6 +7,7 @@ import { ModalProvider, useModals } from '../context/ModalContext';
 import ReportTicketModal from '../pages/requestor/modals/ReportTicketModal';
 import TicketDetailModal from '../pages/requestor/modals/TicketDetailModal';
 import CancelTicketModal from '../pages/requestor/modals/CancelTicketModal';
+import EquipmentDetailModal from '../pages/technician/modals/EquipmentDetailModal';
 
 const { useBreakpoint } = Grid;
 
@@ -14,7 +15,7 @@ function LayoutInner() {
   const screens = useBreakpoint();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const { openReport } = useModals();
+  const { openReport, detailEquipment, closeEquipmentDetail } = useModals();
 
   const isMobile = !screens.lg;
 
@@ -52,6 +53,11 @@ function LayoutInner() {
       <ReportTicketModal onSuccess={handleSuccess} />
       <TicketDetailModal />
       <CancelTicketModal onSuccess={handleSuccess} />
+      <EquipmentDetailModal
+        equipment={detailEquipment}
+        open={!!detailEquipment}
+        onClose={closeEquipmentDetail}
+      />
     </div>
   );
 }

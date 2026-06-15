@@ -26,7 +26,7 @@ def _register_audit(db: Session, current_user: Users, action: str, category: Cat
 
 
 def create_category(db: Session, name: str, current_user: Users) -> Categories:
-    existing = db.query(Categories).filter(Categories.name == name).first()
+    existing = db.query(Categories).filter(Categories.name == name, Categories.deleted_at.is_(None)).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

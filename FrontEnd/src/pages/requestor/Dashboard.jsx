@@ -77,10 +77,10 @@ export default function RequestorDashboard() {
             const days = getDaysElapsed(ticket.opened_at);
             return (
               <div key={ticket.id} className="ticket-row">
-                {/* Col 1 — Código + Categoría */}
+                {/* Col 1 — Código + Descripción */}
                 <div className="ticket-col ticket-col-info">
                   <div className="ticket-number">{ticket.ticket_number}</div>
-                  <div className="ticket-solicitante">{ticket.category || 'Sin categoría'}</div>
+                  <div className="ticket-solicitante">{ticket.title || 'Sin descripción'}</div>
                 </div>
 
                 {/* Col 2 — Departamento */}

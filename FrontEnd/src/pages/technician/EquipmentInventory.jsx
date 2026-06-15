@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, startTransition } from 'react';
 import { Table, Input, Select, Button, Tooltip, Dropdown } from 'antd';
 import { Search, Eye, MoreVertical } from 'lucide-react';
 import { PlusOutlined, EditOutlined, SwapOutlined, StopOutlined, EyeOutlined } from '@ant-design/icons';
+import { useSearchParams } from 'react-router-dom';
 import { listEquipments } from '../../services/equipmentService';
 import { listDepartments } from '../../services/departmentService';
 import { equipmentTypeList, equipmentStatusList } from '../../constants/lists';
@@ -16,13 +17,14 @@ import DecommissionAssetModal from '../admin/modals/DecommissionAssetModal';
 export default function EquipmentInventory() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const [searchParams] = useSearchParams();
 
   const [equipment, setEquipment] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [filters, setFilters] = useState({ search: '', equipment_type: '', status: '' });
+  const [filters, setFilters] = useState({ search: searchParams.get('q') || '', equipment_type: '', status: '' });
   const [departments, setDepartments] = useState([]);
 
   const [detailOpen, setDetailOpen] = useState(false);

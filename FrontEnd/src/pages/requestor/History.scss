@@ -34,3 +34,17 @@
     color: #860404;
   }
 }
+
+@media (max-width: 576px) {
+  .requestor-history {
+    .history-filter-bar {
+      flex-direction: column;
+    }
+
+    .history-filter-status,
+    .history-filter-date {
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
+}

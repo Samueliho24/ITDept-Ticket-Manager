@@ -6,6 +6,7 @@ export function ModalProvider({ children }) {
   const [reportOpen, setReportOpen] = useState(false);
   const [detailTicket, setDetailTicket] = useState(null);
   const [cancelTicket, setCancelTicket] = useState(null);
+  const [detailEquipment, setDetailEquipment] = useState(null);
 
   const openReport = useCallback(() => setReportOpen(true), []);
   const closeReport = useCallback(() => setReportOpen(false), []);
@@ -16,12 +17,16 @@ export function ModalProvider({ children }) {
   const openCancel = useCallback((ticket) => setCancelTicket(ticket), []);
   const closeCancel = useCallback(() => setCancelTicket(null), []);
 
+  const openEquipmentDetail = useCallback((equipment) => setDetailEquipment(equipment), []);
+  const closeEquipmentDetail = useCallback(() => setDetailEquipment(null), []);
+
   return (
     <ModalContext.Provider
       value={{
         reportOpen, openReport, closeReport,
         detailTicket, openDetail, closeDetail,
         cancelTicket, openCancel, closeCancel,
+        detailEquipment, openEquipmentDetail, closeEquipmentDetail,
       }}
     >
       {children}

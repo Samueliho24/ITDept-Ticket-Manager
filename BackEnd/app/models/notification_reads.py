@@ -10,4 +10,4 @@ class NotificationRead(Base):
     ticket_id = Column(String(36), ForeignKey("tickets.id"), nullable=False)
     message = Column(String(255), nullable=False)
     read_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))

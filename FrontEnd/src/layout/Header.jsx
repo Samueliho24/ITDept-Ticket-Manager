@@ -1,11 +1,12 @@
 import './Header.scss';
 import { useState, useRef, useEffect, useCallback, startTransition } from 'react';
-import { Breadcrumb, Badge, Input, Popover, List, Empty, Spin } from 'antd';
+import { Breadcrumb, Badge, Input, Popover, List, Empty, Spin, Tag, Drawer } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, Bell, Search } from 'lucide-react';
 import { getNotifications, markAsRead, getStaleAlerts } from '../services/notificationService';
 import { useModals } from '../context/ModalContext';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 
 const breadcrumbMap = {
   '/dashboard': { section: 'PRINCIPAL', item: 'Inicio' },
@@ -25,19 +26,38 @@ const workspaceMatch = (path) => {
   return null;
 };
 
+const statusColor = (status) => {
+  switch (status) {
+    case 'Abierto': return 'red';
+    case 'Asignado': return 'orange';
+    case 'En Proceso': return 'gold';
+    case 'Pendiente': return 'geekblue';
+    case 'Resuelto': return 'green';
+    case 'Cerrado': return 'default';
+    case 'Anulado': return 'default';
+    default: return 'default';
+  }
+};
+
 export default function Header({ onMenuClick, isMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const isTechOrAdmin = user?.role === 'technician' || user?.role === 'admin';
+  const {
+    searchText, setSearchText,
+    searchResults, searchLoading,
+    searchOpen, setSearchOpen,
+    handleEnter, clearSearch,
+    hasResults,
+  } = useSearch();
+  const { openDetail, openEquipmentDetail } = useModals();
   const [notifications, setNotifications] = useState([]);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const { openDetail } = useModals();
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const pollRef = useRef(null);
-
-  const isTechOrAdmin = user?.role === 'technician' || user?.role === 'admin';
+  const searchInputRef = useRef(null);
 
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
@@ -93,12 +113,18 @@ export default function Header({ onMenuClick, isMobile }) {
     setNotifOpen(false);
   };
 
-  const handleSearch = (value) => {
-    if (!value.trim()) return;
-    navigate('/history', { state: { search: value.trim() } });
-  };
-
   const current = breadcrumbMap[location.pathname] || workspaceMatch(location.pathname) || null;
+
+  const handleResultClick = (item, type) => {
+    clearSearch();
+    if (type === 'ticket') {
+      openDetail(item);
+    } else if (type === 'equipment') {
+      openEquipmentDetail(item);
+    } else if (type === 'user') {
+      navigate(`/users?q=${encodeURIComponent(item.username || '')}`);
+    }
+  };
 
   const notifContent = (
     <div className="notif-dropdown">
@@ -126,6 +152,143 @@ export default function Header({ onMenuClick, isMobile }) {
         />
       )}
     </div>
+  );
+
+  const renderSearchItem = (item, type) => {
+    if (type === 'ticket') {
+      return (
+        <div key={item.id} className="search-item" onClick={() => handleResultClick(item, 'ticket')}>
+          <span className="search-item-code">{item.ticket_number || `#${item.id.slice(0, 8)}`}</span>
+          <span className="search-item-title">{item.title}</span>
+          <Tag color={statusColor(item.status)} className="search-item-tag">{item.status}</Tag>
+        </div>
+      );
+    }
+    if (type === 'equipment') {
+      return (
+        <div key={item.id} className="search-item" onClick={() => handleResultClick(item, 'equipment')}>
+          <span className="search-item-code">{item.inventory_code || `#${item.id.slice(0, 8)}`}</span>
+          <span className="search-item-title">{item.brand} {item.model}</span>
+          <Tag color="blue" className="search-item-tag">{item.equipment_type}</Tag>
+        </div>
+      );
+    }
+    if (type === 'user') {
+      return (
+        <div key={item.id} className="search-item" onClick={() => handleResultClick(item, 'user')}>
+          <span className="search-item-code">{item.username}</span>
+          <span className="search-item-title">{item.name} {item.lastname}</span>
+          <Tag className="search-item-tag">{item.role}</Tag>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const searchDropdownContent = (
+    <div className="search-dropdown">
+      {searchLoading && !hasResults ? (
+        <div className="search-loading"><Spin size="small" /></div>
+      ) : !hasResults ? (
+        <div className="search-empty">Sin resultados</div>
+      ) : (
+        <div className="search-results-scroll">
+          {searchResults.tickets.length > 0 && (
+            <div className="search-section">
+              <div className="search-section-title">TICKETS</div>
+              {searchResults.tickets.map((item) => renderSearchItem(item, 'ticket'))}
+            </div>
+          )}
+          {searchResults.equipments.length > 0 && (
+            <div className="search-section">
+              <div className="search-section-title">EQUIPOS</div>
+              {searchResults.equipments.map((item) => renderSearchItem(item, 'equipment'))}
+            </div>
+          )}
+          {searchResults.users.length > 0 && (
+            <div className="search-section">
+              <div className="search-section-title">USUARIOS</div>
+              {searchResults.users.map((item) => renderSearchItem(item, 'user'))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const desktopSearch = (
+    <Popover
+      content={searchDropdownContent}
+      trigger="click"
+      open={hasResults && searchOpen}
+      onOpenChange={(v) => setSearchOpen(v)}
+      placement="bottomLeft"
+      overlayClassName="search-popover"
+    >
+      <Input
+        placeholder="Buscar tickets, equipos..."
+        className="header-search"
+        variant="borderless"
+        value={searchText}
+        onChange={(e) => { setSearchText(e.target.value); setSearchOpen(true); }}
+        onPressEnter={() => { handleEnter(); }}
+        ref={searchInputRef}
+        prefix={<Search size={16} className="search-input-icon" />}
+        allowClear
+      />
+    </Popover>
+  );
+
+  const mobileSearchOverlay = (
+    <Drawer
+      placement="top"
+      open={mobileSearchOpen}
+      onClose={() => { setMobileSearchOpen(false); clearSearch(); }}
+      height="100%"
+      className="mobile-search-overlay"
+      styles={{ body: { padding: '16px' } }}
+    >
+      <div className="mobile-search-overlay-header">
+        <Input
+          placeholder="Buscar tickets, equipos..."
+          className="mobile-search-overlay-input"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={() => { handleEnter(); setMobileSearchOpen(false); }}
+          prefix={<Search size={16} />}
+          autoFocus
+          allowClear
+        />
+      </div>
+      <div className="mobile-search-overlay-results">
+        {searchLoading && !hasResults ? (
+          <div className="search-loading"><Spin size="small" /></div>
+        ) : !hasResults && searchText.trim() ? (
+          <div className="search-empty">Sin resultados</div>
+        ) : (
+          <>
+            {searchResults.tickets.length > 0 && (
+              <div className="search-section">
+                <div className="search-section-title">TICKETS</div>
+                {searchResults.tickets.map((item) => renderSearchItem(item, 'ticket'))}
+              </div>
+            )}
+            {searchResults.equipments.length > 0 && (
+              <div className="search-section">
+                <div className="search-section-title">EQUIPOS</div>
+                {searchResults.equipments.map((item) => renderSearchItem(item, 'equipment'))}
+              </div>
+            )}
+            {searchResults.users.length > 0 && (
+              <div className="search-section">
+                <div className="search-section-title">USUARIOS</div>
+                {searchResults.users.map((item) => renderSearchItem(item, 'user'))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </Drawer>
   );
 
   return (
@@ -156,24 +319,14 @@ export default function Header({ onMenuClick, isMobile }) {
               ]}
             />
           )}
-          {!isMobile && (
-            <Input.Search
-              placeholder="Buscar..."
-              className="header-search"
-              variant="borderless"
-              size={16}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onSearch={handleSearch}
-            />
-          )}
+          {!isMobile && desktopSearch}
         </div>
         <div className="actions">
           {isMobile && (
             <button
               type="button"
               className="mobile-search-btn"
-              onClick={() => setSearchOpen(!searchOpen)}
+              onClick={() => setMobileSearchOpen(true)}
               aria-label="Buscar"
             >
               <Search size={20} />
@@ -193,18 +346,7 @@ export default function Header({ onMenuClick, isMobile }) {
           </Popover>
         </div>
       </div>
-      {isMobile && searchOpen && (
-        <div className="mobile-search-bar">
-          <Input
-            placeholder="Buscar..."
-            className="mobile-search-input"
-            prefix={<Search size={16} />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onPressEnter={() => handleSearch(searchText)}
-          />
-        </div>
-      )}
+      {isMobile && mobileSearchOverlay}
     </header>
   );
 }

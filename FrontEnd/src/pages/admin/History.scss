@@ -1,6 +1,6 @@
 @use '../../styles/abstracts/variables' as v;
 
-.technician-history {
+.admin-history {
   .history-filter-bar {
     display: flex;
     gap: 12px;
@@ -29,14 +29,10 @@
       letter-spacing: 0.5px;
     }
   }
-
-  .history-atender-link {
-    color: #006699;
-  }
 }
 
 @media (max-width: 576px) {
-  .technician-history {
+  .admin-history {
     .history-filter-bar {
       flex-direction: column;
     }

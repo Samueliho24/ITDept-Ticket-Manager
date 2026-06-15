@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
@@ -29,10 +30,11 @@ def create_user_endpoint(
 def list_users_endpoint(
     limit: int = Query(10, ge=1, le=1000, description="Registros por página"),
     offset: int = Query(0, ge=0, description="Desplazamiento"),
+    search: Optional[str] = Query(None, description="Búsqueda parcial en nombre, apellido o username"),
     db: Session = Depends(getDb),
     current_user: Users = Depends(RoleChecker(["admin"])),
 ):
-    items, total = list_users(db, limit, offset)
+    items, total = list_users(db, limit, offset, search)
     return UserPaginated(total=total, limit=limit, offset=offset, items=items)
 
 

@@ -4,8 +4,7 @@ import { Table, Select, DatePicker, Space, Tag, Button, Tooltip } from 'antd';
 import { Eye } from 'lucide-react';
 import { listTickets } from '../../services/ticketService';
 import { ticketStatusList } from '../../constants/lists';
-import { useModals } from '../../context/ModalContext';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const { RangePicker } = DatePicker;
 
@@ -22,7 +21,7 @@ const statusColor = (status) => {
   }
 };
 
-export default function RequestorHistory() {
+export default function AdminHistory() {
   const [tickets, setTickets] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -30,9 +29,8 @@ export default function RequestorHistory() {
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState(null);
   const [dateRange, setDateRange] = useState(null);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { openDetail, openCancel } = useModals();
-
   const searchQuery = searchParams.get('q') || '';
 
   const fetchTickets = useCallback(async () => {
@@ -48,8 +46,8 @@ export default function RequestorHistory() {
       };
       Object.keys(params).forEach((k) => { if (!params[k]) delete params[k]; });
       const res = await listTickets(params);
-      setTickets(res.data.items);
-      setTotal(res.data.total);
+      setTickets(res.data.items || []);
+      setTotal(res.data.total || 0);
     } catch {
       setTickets([]);
     } finally {
@@ -63,52 +61,35 @@ export default function RequestorHistory() {
 
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 110,
+      title: 'ID', dataIndex: 'id', key: 'id', width: 100,
       render: (_, record) => <span className="ticket-id">{record.ticket_number || `#${record.id.slice(0, 8)}`}</span>,
     },
+    { title: 'Descripción', dataIndex: 'title', key: 'title', ellipsis: true },
+    { title: 'Solicitante', dataIndex: 'requester_name', key: 'requester', width: 150, render: (v) => v || '—' },
+    { title: 'Técnico', dataIndex: 'assigned_to_name', key: 'assigned', width: 150, render: (v) => v || '—', responsive: ['md' ] },
     {
-      title: 'Descripción',
-      dataIndex: 'title',
-      key: 'title',
-      ellipsis: true,
+      title: 'Estado', dataIndex: 'status', key: 'status', width: 120,
+      render: (s) => <Tag color={statusColor(s)}>{s}</Tag>,
+    },
+    { title: 'Prioridad', dataIndex: 'priority', key: 'priority', width: 100, responsive: ['lg' ] },
+    {
+      title: 'Fecha', dataIndex: 'opened_at', key: 'opened_at', width: 110,
+      render: (d) => (d ? new Date(d).toLocaleDateString('es-ES') : '—'),
     },
     {
-      title: 'Estado',
-      dataIndex: 'status',
-      key: 'status',
-      width: 120,
-      render: (status) => <Tag color={statusColor(status)}>{status}</Tag>,
-    },
-    {
-      title: 'Fecha',
-      dataIndex: 'opened_at',
-      key: 'opened_at',
-      width: 110,
-      responsive: ['md' ],
-      render: (date) => date ? new Date(date).toLocaleDateString('es-ES') : '—',
-    },
-    {
-      title: 'Acción',
-      key: 'action',
-      width: 120,
+      title: 'Acción', key: 'action', width: 100,
       render: (_, record) => (
         <Space>
           <Tooltip title="Ver detalle">
-            <Button type="text" icon={<Eye size={18} />} onClick={() => openDetail(record)} />
+            <Button type="text" icon={<Eye size={18} />} onClick={() => navigate(`/workspace/${record.ticket_number || record.id}`)} />
           </Tooltip>
-          {(record.status === 'Abierto') && (
-            <a onClick={() => openCancel(record)} className="history-cancel-link">Anular</a>
-          )}
         </Space>
       ),
     },
   ];
 
   return (
-    <div className="requestor-history">
+    <div className="admin-history">
       <h2 className="page-title">HISTORIAL DE TICKETS</h2>
       <div className="history-filter-bar">
         <Select
@@ -131,9 +112,7 @@ export default function RequestorHistory() {
         loading={loading}
         scroll={{ x: 'max-content' }}
         pagination={{
-          current: page,
-          pageSize,
-          total,
+          current: page, pageSize, total,
           onChange: (p, ps) => { setPage(p); setPageSize(ps); },
           showSizeChanger: true,
           pageSizeOptions: ['5', '10', '20', '50'],

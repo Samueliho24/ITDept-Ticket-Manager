@@ -10,7 +10,7 @@ class Departments(Base):
     name = Column(String(100), nullable=False)
     code = Column(String(3), unique=True, nullable=False)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     deleted_at = Column(DateTime, nullable=True)
 
     user = relationship("Users", back_populates="department")
