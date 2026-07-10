@@ -109,10 +109,10 @@ function SidebarContent({ onAction }) {
 
       <div className="sidebar-footer">
         <div className="footer-avatar">
-          {user?.username?.charAt(0).toUpperCase() || 'U'}
+          {user?.name?.charAt(0).toUpperCase() || 'U'}
         </div>
         <div className="footer-info">
-          <div className="footer-name">{user?.username || 'Usuario'}</div>
+          <div className="footer-name">{user?.name + ' ' + user?.lastname || 'Usuario' }</div>
           <div className="footer-role">{ROLE_LABELS[user?.role] || ''}</div>
         </div>
         <button

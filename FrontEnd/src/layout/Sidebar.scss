@@ -174,7 +174,7 @@
     border-radius: 0 v.$border-radius-sm v.$border-radius-sm 0;
     color: v.$color-text;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     transition: v.$transition-base;
     cursor: pointer;
@@ -210,7 +210,7 @@
   }
 
   .section-label {
-    font-size: 10px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: v.$color-text-light;
@@ -250,7 +250,7 @@
   }
 
   .footer-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: v.$color-text;
     white-space: nowrap;
@@ -259,7 +259,7 @@
   }
 
   .footer-role {
-    font-size: 11px;
+    font-size: 12px;
     color: v.$color-text-light;
     white-space: nowrap;
     overflow: hidden;

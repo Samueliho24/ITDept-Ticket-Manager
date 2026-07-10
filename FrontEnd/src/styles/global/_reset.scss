@@ -46,9 +46,11 @@ body {
 }
 
 .app-footer {
+  display: flex;
+  flex-direction: row;
   flex-shrink: 0;
-  text-align: center;
-  padding: 10px 24px;
+  justify-content: space-between;
+  padding: 10px 30px;
   font-size: 12px;
   color: v.$color-text-light;
   border-top: 1px solid v.$color-header-border;
@@ -56,11 +58,13 @@ body {
 
   h4 {
     font-weight: 600;
+    text-align: left;
     margin: 0 0 2px;
     font-size: inherit;
   }
 
   p {
+    text-align: right;
     margin: 0;
     opacity: 0.7;
   }
