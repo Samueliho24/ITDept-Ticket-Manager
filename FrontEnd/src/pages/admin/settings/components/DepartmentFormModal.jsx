@@ -13,6 +13,7 @@ export default function DepartmentFormModal({ open, onClose, onSuccess, departme
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      values.code = values.code.toUpperCase();
       setSubmitting(true);
       if (isEditing) {
         await updateDepartment(department.id, values);
@@ -38,6 +39,7 @@ export default function DepartmentFormModal({ open, onClose, onSuccess, departme
       onCancel={onClose}
       width={480}
       destroyOnClose
+      closable={false}
       footer={
         <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>
@@ -68,7 +70,7 @@ export default function DepartmentFormModal({ open, onClose, onSuccess, departme
           <Input
             maxLength={3}
             className="department-code-input"
-            onChange={(e) => { e.target.value = e.target.value.toUpperCase(); }}
+            onChange={(e) => { e.target.value.toUpperCase(); }}
             placeholder="Ej: RHS"
           />
         </Form.Item>
