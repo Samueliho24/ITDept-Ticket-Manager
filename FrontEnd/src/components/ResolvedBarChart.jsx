@@ -1,12 +1,14 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Spin, Empty } from 'antd';
+import { Empty, Skeleton } from 'antd';
 
 export default function ResolvedBarChart({ data, loading }) {
   if (loading) {
     return (
       <div className="chart-card">
         <h3 className="chart-card__title">Tickets Resueltos</h3>
-        <div className="chart-card__loading"><Spin /></div>
+        <div className="chart-skeleton">
+          <Skeleton.Input active block style={{ height: 240 }} />
+        </div>
       </div>
     );
   }

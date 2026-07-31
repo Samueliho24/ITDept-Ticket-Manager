@@ -148,9 +148,12 @@ def update_equipment_status(db: Session, equipment_id: str, data: EquipmentStatu
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Equipo no encontrado.")
     old_status = equipment.status
     equipment.status = data.status
+    if data.status == "Desincorporado":
+        equipment.out_date = datetime.now(timezone.utc)
     _register_audit(db, current_user, "change_equipment_status", equipment, {
         "from_status": old_status,
         "to_status": data.status,
+        "out_date": str(equipment.out_date) if equipment.out_date else None,
     })
     try:
         db.commit()

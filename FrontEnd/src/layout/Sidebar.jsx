@@ -51,7 +51,7 @@ const navSections = [
   },
 ];
 
-function SidebarContent({ onAction }) {
+function SidebarContent({ onAction, onMobileClose }) {
   const location = useLocation();
   const { user, logout } = useAuth();
 
@@ -86,6 +86,7 @@ function SidebarContent({ onAction }) {
                     key={item.path}
                     to={item.path}
                     className={`item${isActive(item.path) ? ' active' : ''}`}
+                    onClick={onMobileClose}
                   >
                     <span className="icon">{item.icon}</span>
                     <span className="label">{item.label}</span>
@@ -112,7 +113,7 @@ function SidebarContent({ onAction }) {
           {user?.name?.charAt(0).toUpperCase() || 'U'}
         </div>
         <div className="footer-info">
-          <div className="footer-name">{user?.name + ' ' + user?.lastname || 'Usuario' }</div>
+          <div className="footer-name">{(user?.name || user?.lastname) ? `${user?.name || ''} ${user?.lastname || ''}`.trim() : 'Usuario'}</div>
           <div className="footer-role">{ROLE_LABELS[user?.role] || ''}</div>
         </div>
         <button
@@ -148,7 +149,7 @@ export default function Sidebar({ isMobile, mobileOpen, onMobileClose, onAction 
         styles={{ body: { padding: 0 } }}
       >
         <div className="sidebar in-drawer">
-          <SidebarContent onAction={onAction} />
+          <SidebarContent onAction={onAction} onMobileClose={onMobileClose} />
         </div>
       </Drawer>
     );

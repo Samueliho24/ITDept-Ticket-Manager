@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import JSONResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 from BackEnd.app.core.db import getDb
 from BackEnd.app.core.security import (
@@ -11,10 +13,12 @@ from BackEnd.app.models.users import Users
 from BackEnd.app.services.auth_service import login_service
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/login")
-def login(login_data: LoginRequest, response: Response, db: Session = Depends(getDb)):
+@limiter.limit("5/minute")
+def login(request: Request, login_data: LoginRequest, response: Response, db: Session = Depends(getDb)):
     user, token = login_service(db, login_data)
     set_auth_cookie(response, token)
     return {

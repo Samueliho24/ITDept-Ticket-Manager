@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { loginService, authMeService, refreshTokenService, logoutService } from '../services/authService';
+import SplashScreen from '../pages/common/SplashScreen';
 
 export const ROLES = Object.freeze(['admin', 'technician', 'requestor']);
 
@@ -13,8 +14,6 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [state, setState] = useState(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     return { user: null, loading: true };
   });
   const refreshTimerRef = useRef(null);
@@ -28,7 +27,7 @@ export function AuthProvider({ children }) {
         clearInterval(refreshTimerRef.current);
         refreshTimerRef.current = null;
         setState({ user: null, loading: false });
-        window.location.href = '/login';
+        window.location.replace('/login');
       }
     }, 15 * 60 * 1000);
   }, []);
@@ -41,15 +40,35 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    let settled = false;
+    const safetyTimer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        setState({ user: null, loading: false });
+      }
+    }, 10000);
+
     authMeService()
       .then((res) => {
-        setState({ user: res.data, loading: false });
-        startRefreshTimer();
+        if (!settled) {
+          settled = true;
+          clearTimeout(safetyTimer);
+          setState({ user: res.data, loading: false });
+          startRefreshTimer();
+        }
       })
       .catch(() => {
-        setState({ user: null, loading: false });
+        if (!settled) {
+          settled = true;
+          clearTimeout(safetyTimer);
+          setState({ user: null, loading: false });
+        }
       });
-    return () => stopRefreshTimer();
+
+    return () => {
+      clearTimeout(safetyTimer);
+      stopRefreshTimer();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,6 +91,10 @@ export function AuthProvider({ children }) {
   }, [stopRefreshTimer]);
 
   const isAuthenticated = !!state.user;
+
+  if (state.loading) {
+    return <SplashScreen />;
+  }
 
   return (
     <AuthContext.Provider value={{ user: state.user, login, logout, isAuthenticated, loading: state.loading }}>

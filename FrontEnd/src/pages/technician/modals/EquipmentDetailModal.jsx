@@ -1,6 +1,6 @@
 import './EquipmentDetailModal.scss';
 import { useState, useEffect, startTransition } from 'react';
-import { Modal, Descriptions, Tag, Table, Spin, Button, Space } from 'antd';
+import { Modal, Descriptions, Tag, Table, Button, Space, Skeleton } from 'antd';
 import { EditOutlined, SwapOutlined, StopOutlined } from '@ant-design/icons';
 import { listTickets } from '../../../services/ticketService';
 
@@ -129,7 +129,7 @@ export default function EquipmentDetailModal({ equipment, open, onClose, onEdit,
           <div className="equip-detail-block">
             <h4>Historial de Mantenimiento</h4>
             {histLoading ? (
-              <Spin />
+              <Skeleton active paragraph={{ rows: 3 }} />
             ) : (
               <Table
                 dataSource={maintenanceHistory}

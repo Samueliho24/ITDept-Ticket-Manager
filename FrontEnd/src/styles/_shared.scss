@@ -108,9 +108,9 @@
 }
 
 .login-gradient-bg {
-  background: linear-gradient(135deg, v.$color-primary 0%, v.$color-accent 100%);
+  background: linear-gradient(135deg, v.$color-accent 0%, v.$color-primary 100%);
   background-image: radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
-                    linear-gradient(135deg, v.$color-primary 0%, v.$color-accent 100%);
+                    linear-gradient(135deg, v.$color-accent 0%, v.$color-primary 100%);
 }
 
 // ============================================
@@ -801,4 +801,21 @@
       flex-shrink: 0;
     }
   }
+}
+
+// ============================================
+// SKELETON LOADING SHARED
+// ============================================
+.skeleton-row {
+  padding: 16px 20px !important;
+
+  .ant-skeleton {
+    margin-bottom: 4px;
+  }
+}
+
+.chart-skeleton {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
 }

@@ -1,5 +1,5 @@
 import './TicketListView.scss';
-import { Tag, Button, Tooltip, Spin, Empty, Badge } from 'antd';
+import { Tag, Button, Tooltip, Empty, Badge, Skeleton } from 'antd';
 import { Eye, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -40,7 +40,29 @@ export default function TicketListView({ tickets, loading, title = 'Tickets', sh
       </div>
 
       {loading ? (
-        <div className="loading-center"><Spin size="large" /></div>
+        <div className="ticket-list-body">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="ticket-row skeleton-row">
+              <div className="ticket-col ticket-col-info">
+                <Skeleton.Input active block style={{ width: 120, height: 18 }} />
+                <Skeleton.Input active block style={{ width: 160, height: 14, marginTop: 6 }} />
+              </div>
+              <div className="ticket-col ticket-col-dept">
+                <Skeleton.Input active block style={{ width: 80, height: 14 }} />
+              </div>
+              <div className="ticket-col ticket-col-cat">
+                <Skeleton.Input active block style={{ width: 60, height: 18 }} />
+              </div>
+              <div className="ticket-col ticket-col-date">
+                <Skeleton.Input active block style={{ width: 90, height: 14 }} />
+                <Skeleton.Input active block style={{ width: 50, height: 14, marginTop: 4 }} />
+              </div>
+              <div className="ticket-col ticket-col-action">
+                <Skeleton.Button active block style={{ width: 80, height: 32 }} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : tickets.length === 0 ? (
         <Empty description="No hay tickets disponibles" />
       ) : (

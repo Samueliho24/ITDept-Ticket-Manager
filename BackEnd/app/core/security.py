@@ -13,10 +13,15 @@ from BackEnd.app.models.users import Users
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET", "fallback-secret-key-change-in-production")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+SECRET_KEY = os.getenv("SECRET")
+if ENVIRONMENT == "production" and not SECRET_KEY:
+    raise RuntimeError("La variable SECRET es obligatoria en modo producción.")
+SECRET_KEY = SECRET_KEY or "fallback-secret-key-change-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 SESSION_MAX_HOURS = int(os.getenv("SESSION_MAX_HOURS", "8"))
+SECURE_COOKIES = ENVIRONMENT == "production"
 
 security_scheme = HTTPBearer(auto_error=False)
 
@@ -58,7 +63,7 @@ def set_auth_cookie(response: Response, token: str):
         value=token,
         httponly=True,
         samesite="lax",
-        secure=False,
+        secure=SECURE_COOKIES,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         path="/",
     )
@@ -70,7 +75,7 @@ def clear_auth_cookie(response: Response):
         path="/",
         httponly=True,
         samesite="lax",
-        secure=False,
+        secure=SECURE_COOKIES,
     )
 
 

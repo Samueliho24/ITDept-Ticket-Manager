@@ -1,6 +1,13 @@
 @use '../../styles/abstracts/variables' as v;
 
 .requestor-history {
+  .history-status-tag {
+    min-width: 80px;
+    text-align: center; 
+    display: inline-block;
+    font-size: 13px;
+  }
+  
   .history-filter-bar {
     display: flex;
     gap: 12px;
@@ -22,7 +29,7 @@
 
   .history-table {
     .ticket-id {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: v.$color-text-light;
       text-transform: uppercase;

@@ -1,0 +1,137 @@
+@use '../../styles/abstracts/variables' as v;
+
+.splash-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  min-width: 340px;
+  max-width: 440px;
+}
+
+.splash-logos {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.splash-divider {
+  width: 1px;
+  height: 56px;
+  background: v.$color-header-border;
+}
+
+.splash-logo {
+  object-fit: contain;
+
+  &--luz {
+    height: 80px;
+  }
+
+  &--fac {
+    height: 72px;
+  }
+}
+
+.splash-texts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.splash-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: v.$color-text;
+  margin: 0;
+}
+
+.splash-dept {
+  font-size: 13px;
+  font-weight: 600;
+  color: v.$color-primary;
+  margin: 0;
+}
+
+.splash-subtitle {
+  font-size: 12px;
+  color: v.$color-text-light;
+  margin: 0;
+}
+
+.splash-progress-track {
+  width: 180px;
+  height: 3px;
+  background: v.$color-header-border;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.splash-progress-bar {
+  height: 100%;
+  width: 40%;
+  background: v.$color-primary;
+  border-radius: 3px;
+  animation: splash-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes splash-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(150%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: v.$breakpoint-mobile) {
+  .splash-card {
+    padding: 28px 24px;
+    margin: 16px;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .splash-logos {
+    gap: 16px;
+  }
+
+  .splash-logo {
+    &--luz {
+      height: 56px;
+    }
+
+    &--fac {
+      height: 52px;
+    }
+  }
+
+  .splash-divider {
+    height: 36px;
+  }
+
+  .splash-title {
+    font-size: 17px;
+  }
+
+  .splash-dept {
+    font-size: 12px;
+  }
+}

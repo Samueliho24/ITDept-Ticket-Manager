@@ -46,7 +46,7 @@ function LayoutInner() {
           <Outlet context={{ refreshKey }} />
         </div>
         <footer className="app-footer">
-          <h4>Departamento de Tecnología, Información y Comunicación</h4>
+          <h4>© {new Date().getFullYear()} Departamento de Tecnología, Información y Comunicación</h4>
           <p>Facultad de Odontología · Universidad del Zulia</p>
         </footer>
       </div>

@@ -135,6 +135,11 @@ export default function PublicTicketView() {
           </Button>
         </div>
       </div>
+
+      <div className="login-footer">
+        <p>© {new Date().getFullYear()} Departamento de Tecnología, Información y Comunicación</p>
+        <p>Facultad de Odontología · Universidad del Zulia</p>
+      </div>
     </div>
   );
 }

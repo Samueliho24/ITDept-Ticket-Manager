@@ -1,12 +1,16 @@
 import './DepartmentDonutChart.scss';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Spin, Empty } from 'antd';
+import { Empty, Skeleton } from 'antd';
 
 const COLORS = ['#006699', '#D97706', '#1A8C06', '#860404', '#6B7280', '#8B5CF6'];
 
 export default function DepartmentDonutChart({ data, loading }) {
   if (loading) {
-    return <div className="chart-card__loading chart-loading-center"><Spin /></div>;
+    return (
+      <div className="chart-skeleton">
+        <Skeleton.Input active block style={{ height: 240 }} />
+      </div>
+    );
   }
 
   if (!data || data.length === 0) {

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../layout/MainLayout';
 import Login from '../pages/common/Login';
+import NotFound from '../pages/common/NotFound';
 import PublicReport from '../pages/public/PublicReport';
 import PublicTicketView from '../pages/public/PublicTicketView';
 import RequestorDashboard from '../pages/requestor/Dashboard';
@@ -55,7 +56,7 @@ export default function AppRoutes() {
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

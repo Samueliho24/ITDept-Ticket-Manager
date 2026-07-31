@@ -1,5 +1,5 @@
 import './KpiCard.scss';
-import { Spin } from 'antd';
+import { Skeleton } from 'antd';
 
 export default function KpiCard({ icon, value, label, trend, trendDirection, color, loading }) {
   return (
@@ -12,7 +12,10 @@ export default function KpiCard({ icon, value, label, trend, trendDirection, col
       </div>
       <div className="kpi-analytics__body">
         {loading ? (
-          <Spin size="small" />
+          <>
+            <Skeleton.Input active style={{ width: 60, height: 32 }} size="small" />
+            <Skeleton.Input active style={{ width: 90, height: 14, marginTop: 6 }} size="small" />
+          </>
         ) : (
           <>
             <div className="kpi-analytics__value" style={{ color }}>{value}</div>

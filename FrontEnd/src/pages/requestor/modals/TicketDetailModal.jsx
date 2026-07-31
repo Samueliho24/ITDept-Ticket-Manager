@@ -1,5 +1,5 @@
 import { useState, useEffect, startTransition } from 'react';
-import { Modal, Timeline, Steps, Tag, Rate, Spin, Descriptions, Empty } from 'antd';
+import { Modal, Timeline, Steps, Tag, Rate, Descriptions, Empty, Skeleton } from 'antd';
 import { getTicket, getTicketHistory, rateTicket } from '../../../services/ticketService';
 import { useModals } from '../../../context/ModalContext';
 
@@ -99,7 +99,7 @@ export default function TicketDetailModal() {
           <div className="detail-section">
             <h4>Historial</h4>
             {loading ? (
-              <Spin />
+              <Skeleton active paragraph={{ rows: 4 }} />
             ) : history.length === 0 ? (
               <Empty description="Sin historial" />
             ) : (

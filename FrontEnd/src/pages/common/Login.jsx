@@ -99,7 +99,7 @@ export default function Login() {
       </div>
 
       <div className="login-footer">
-        <h4>Departamento de Tecnología, Información y Comunicación</h4>
+        <p>© {new Date().getFullYear()} Departamento de Tecnología, Información y Comunicación</p>
         <p>Facultad de Odontología · Universidad del Zulia</p>
       </div>
 

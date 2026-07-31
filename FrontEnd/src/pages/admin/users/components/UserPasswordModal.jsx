@@ -39,7 +39,7 @@ export default function UserPasswordModal({ open, onClose, onSuccess, user }) {
       onCancel={() => { form.resetFields(); onClose(); }}
       width={420}
       destroyOnClose
-      closeable={false}
+      closable={false}
       footer={
         <Space className="flex-space-between">
           <Button onClick={() => { form.resetFields(); onClose(); }}>Cancelar</Button>

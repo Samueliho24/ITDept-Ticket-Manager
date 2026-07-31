@@ -49,8 +49,13 @@ def _enrich_tickets_with_names(db: Session, tickets: list[Tickets]):
 
 
 ALLOWED_TRANSITIONS = {
-    "En Proceso": True,
-    "Pendiente": True,
+    "Abierto": set(),
+    "Asignado": {"En Proceso"},
+    "En Proceso": {"Pendiente", "Resuelto"},
+    "Pendiente": {"En Proceso"},
+    "Resuelto": set(),
+    "Cerrado": set(),
+    "Anulado": set(),
 }
 
 VALID_TICKET_STATUSES = {"Abierto", "Asignado", "En Proceso", "Pendiente", "Resuelto", "Cerrado", "Anulado"}
@@ -270,14 +275,15 @@ def assign_ticket(db: Session, ticket_id: str, data: TicketAssign, current_user:
 
 
 def update_ticket_status(db: Session, ticket_id: str, data: TicketStatusUpdate, current_user: Users) -> Tickets:
-    if data.status not in ALLOWED_TRANSITIONS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Transición de estado no permitida. Solo: {', '.join(ALLOWED_TRANSITIONS)}.",
-        )
     ticket = _resolve_ticket_identifier(db, ticket_id)
     if not ticket:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket no encontrado.")
+    allowed_from_current = ALLOWED_TRANSITIONS.get(ticket.status, set())
+    if data.status not in allowed_from_current:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"No se puede cambiar de '{ticket.status}' a '{data.status}'. Transiciones válidas desde '{ticket.status}': {', '.join(sorted(allowed_from_current)) or 'Ninguna'}.",
+        )
     previous_status = ticket.status
     ticket.status = data.status
     username = f"{current_user.name} {current_user.lastname}" if current_user.name else current_user.username

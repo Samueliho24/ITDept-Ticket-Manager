@@ -1,7 +1,7 @@
 import './Workspace.scss';
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Input, Select, Button, Spin, Tag, message, Divider } from 'antd';
+import { Card, Descriptions, Input, Select, Button, Spin, Tag, message, Divider, Skeleton } from 'antd';
 import { ArrowLeft, Search, Wrench } from 'lucide-react';
 import { getTicket, updateTicketStatus, updateTicketCategory } from '../../services/ticketService';
 import { listEquipments } from '../../services/equipmentService';
@@ -34,11 +34,6 @@ export default function Workspace() {
         setCategory(t.category || null);
         setTicketStatus(t.status);
         if (t.equipment_id) setSelectedEquipment(t.equipment_id);
-        if (t.status === 'Asignado') {
-          updateTicketStatus(ticketId, { status: 'En Proceso' })
-            .then(() => { setTicket((prev) => ({ ...prev, status: 'En Proceso' })); })
-            .catch(() => {});
-        }
       })
       .catch(() => { message.error('Error al cargar ticket'); navigate('/dashboard'); })
       .finally(() => setLoading(false));
@@ -105,7 +100,22 @@ export default function Workspace() {
   };
 
   if (loading) {
-    return <div className="loading-center"><Spin size="large" /></div>;
+    return (
+      <div className="workspace-layout">
+        <div className="workspace-header">
+          <Skeleton.Button active style={{ width: 160, height: 32 }} />
+          <Skeleton.Input active style={{ width: 140, height: 24 }} />
+        </div>
+        <div className="workspace-panels">
+          <Card title="Información del Ticket">
+            <Skeleton paragraph={{ rows: 5 }} active />
+          </Card>
+          <Card title="Herramientas de Soporte">
+            <Skeleton paragraph={{ rows: 5 }} active />
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   if (!ticket) return null;
@@ -128,6 +138,20 @@ export default function Workspace() {
             <Descriptions.Item label="Prioridad">{ticket.priority}</Descriptions.Item>
             <Descriptions.Item label="Categoría">{ticket.category || '—'}</Descriptions.Item>
           </Descriptions>
+          {ticketStatus === 'Asignado' && (
+            <>
+              <Divider />
+              <Button
+                type="primary"
+                block
+                size="large"
+                loading={statusUpdating}
+                onClick={() => handleStatusChange('En Proceso')}
+              >
+                Comenzar Atención
+              </Button>
+            </>
+          )}
           <Divider />
           <div className="workspace-desc">
             <h4>Descripción de la Falla</h4>

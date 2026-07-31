@@ -66,7 +66,7 @@ export default function RequestorHistory() {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 110,
+      width: 150,
       render: (_, record) => <span className="ticket-id">{record.ticket_number || `#${record.id.slice(0, 8)}`}</span>,
     },
     {
@@ -80,7 +80,7 @@ export default function RequestorHistory() {
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status) => <Tag color={statusColor(status)}>{status}</Tag>,
+      render: (status) => <Tag className="history-status-tag" color={statusColor(status)}>{status}</Tag>,
     },
     {
       title: 'Fecha',

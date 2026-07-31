@@ -143,6 +143,11 @@ export default function PublicReport() {
         </div>
       </div>
 
+      <div className="login-footer">
+        <p>© {new Date().getFullYear()} Departamento de Tecnología, Información y Comunicación</p>
+        <p>Facultad de Odontología · Universidad del Zulia</p>
+      </div>
+
       <Modal
         title="Reporte Enviado"
         open={successModal}

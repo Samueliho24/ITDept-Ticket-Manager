@@ -36,7 +36,7 @@ export default function UserStatusModal({ open, onClose, onSuccess, user }) {
       onCancel={onClose}
       width={480}
       destroyOnClose
-      closeable={false}
+      closable={false}
       footer={
         <Space className="flex-space-between">
           <Button onClick={onClose}>Cancelar</Button>

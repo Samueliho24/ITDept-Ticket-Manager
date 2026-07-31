@@ -14,6 +14,7 @@ PyJWT==2.13.0
 python-dotenv==1.2.2
 multipart==1.3.1
 annotated-types==0.7.0
+slowapi==0.1.9
 
 # --- Desarrollo ---
 pytest==9.0.3
