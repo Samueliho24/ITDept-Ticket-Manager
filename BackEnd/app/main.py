@@ -45,7 +45,6 @@ def _run_migrations():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    _run_migrations()
     db = SessionLocal()
     try:
         default_admin(db)

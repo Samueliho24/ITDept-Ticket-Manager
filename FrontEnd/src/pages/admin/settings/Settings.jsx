@@ -240,7 +240,7 @@ export default function Settings() {
         />
       </section>
 
-      {/* SLA SECTION — maquetado */}
+      {/* SLA SECTION — maquetado 
       <section className="settings-section settings-disabled">
         <div className="settings-section-header">
           <h3>Umbrales de Trazabilidad (SLA)</h3>
@@ -254,7 +254,7 @@ export default function Settings() {
           </Form>
         </div>
       </section>
-
+      */}
       {/* CATEGORIES SECTION */}
       <section className="settings-section">
         <div className="settings-section-header">
